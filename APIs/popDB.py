@@ -1,131 +1,87 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
 #
-# Python interface to access Popularity Database. Use SSO cookie to avoid password 
+# Python interface to access Popularity Database. See website for API documentation
+# (https://cms-popularity.cern.ch/popdb/popularity/apidoc)
+#
+# Use SSO cookie to avoid password 
 # (http://linux.web.cern.ch/linux/docs/cernssocookie.shtml)
 #
+# The API doesn't check to make sure correct values are passed or that any values are passed. All
+# such checks needs to be done by the caller.
+#
+# It is up to the caller to make sure a valid SSO cookie is obtained before any calls are made. A
+# SSO cookie is valid for 24h.
+#
 #---------------------------------------------------------------------------------------------------
-import os, re, sys, urllib, urllib2, httplib, time, datetime, subprocess
+import sys, os, re, urllib, urllib2, httplib, time, datetime, subprocess
 try:
     import json
 except ImportError:
     import simplejson as json
 from subprocess import call, Popen, PIPE
 
-################################################################################
-#                                                                              #
-#                             P o p   D B   A P I                              #
-#                                                                              #
-################################################################################
-
-class PopDBAPI():
-    # Useful variables
-    # POP_DB_BASE = "https://cms-popularity.cern.ch/popdb/popularity/"
-    # SITE = "T2_US_Nebraska"
-    # CERT = "/grid_home/cmsphedex/gridcert/myCert.pem"
-    # KEY = "/grid_home/cmsphedex/gridcert/myCert.key"
-    # COOKIE = "/grid_home/cmsphedex/gridcert/ssocookie.txt"
+class popDB():
     def __init__(self):
-        self.logger      = DynDTALogger()
-        self.POP_DB_BASE = "https://cms-popularity.cern.ch/popdb/popularity/"
-        self.CERT        = "/home/bockelman/barrefors/certs/myCert.pem"
-        self.KEY         = "/home/bockelman/barrefors/certs/myCert.key"
-        self.COOKIE      = "/home/bockelman/barrefors/certs/ssocookie.txt"
+        self.BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+        self.POPDB_BASE = "https://cms-popularity.cern.ch/popdb/popularity/"
+        self.CERT = "%s/certs/myCert.pem" % (self.BASEDIR)
+        self.KEY = "%s/certs/myCert.key" % (self.BASEDIR)
+        self.COOKIE = "%s/certs/ssocookie.txt" % (self.BASEDIR)
 
-
-    ############################################################################
-    #                                                                          #
-    #                      R E N E W   S S O   C O O K I E                     #
-    #                                                                          #
-    ############################################################################
-
+#===================================================================================================
+#  H E L P E R S
+#===================================================================================================
     def renewSSOCookie(self):
-        """
-        _renewSSOCookie_
+        subprocess.call(["cern-get-sso-cookie", "--cert", self.CERT, "--key", self.KEY, "-u", self.POPDB_BASE, "-o", self.COOKIE])
 
-        Renew the SSO Cookie used for accessing popularity db
-        """
-        subprocess.call(["cern-get-sso-cookie", "--cert", self.CERT, "--key", self.KEY, "-u", self.POP_DB_BASE, "-o", self.COOKIE])
-
-
-    ############################################################################
-    #                                                                          #
-    #                           P O P   D B   C A L L                          #
-    #                                                                          #
-    ############################################################################
-
-    def PopDBCall(self, url, values):
-        """
-        _PopDBCall_
-
-        cURL PopDB API call.
-        """
-        name = "PopDBAPICall"
+    def call(self, url, values):
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
         full_url = request.get_full_url() + request.get_data()
-        p1 = subprocess.Popen(["curl", "-k", "-s", "-L", "--cookie", self.COOKIE, "--cookie-jar", self.COOKIE, full_url], stdout=subprocess.PIPE)
-        try:
-            response = p1.communicate()[0]
-        except ValueError:
-            return 1, "Error"
-        return 0, response
+        process = subprocess.Popen(["curl", "-k", "-s", "-L", "--cookie", self.COOKIE, "--cookie-jar", self.COOKIE, full_url], stdout=subprocess.PIPE)
+        strout, error = process.communicate()
+        if process.returncode != 0:
+            raise Exception("FATAL - popularity failure, exit status %s" % (str(process.returncode)))
+        return json.loads(strout)
 
-
-    ############################################################################
-    #                                                                          #
-    #                           G E T   D S   D A T A                          #
-    #                                                                          #
-    ############################################################################
-
-    def getDSStatInTimeWindow(self, tstart='', tstop='', sitename='summary'):
-        """
-        _getDSdata_
-
-        Get data from popularity DB for a specified time window
-
-        Keyword arguments:
-        sitename -- Name of site to get values from, default is summary (all)
-        tstart   -- Start date of time window
-        tstop    -- End data of time window
-        aggr     -- Aggregate results into intervals of day/week/quarter/year
-        n        -- Number of sets to return
-        orderby  -- Metric to use, totcpu/naccess/nusers
-
-        Return values:
-        check -- 0 if all went well, 1 if error occured
-        data  -- List of tuples with set and value
-        """
-        name = "getDSdata"
+#===================================================================================================
+#  A P I   C A L L S
+#===================================================================================================
+    def DSStatInTimeWindow(self, tstart='', tstop='', sitename=''):
         values = { 'sitename' : sitename, 'tstart' : tstart, 'tstop' : tstop }
-        dsdata_url = urllib.basejoin(self.POP_DB_BASE, "%s/?&" % ("DSStatInTimeWindow",))
-        check, response = self.PopDBCall(dsdata_url, values)
-        if check:
-            self.logger.error(name, "getDSStatInTimeWindow call failed.")
-            return 1, "Error"
-        json_data = json.loads(response)
-        data = json_data.get('DATA')
-        return 0, data
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DSStatInTimeWindow"))
+        return self.call(url, values)
 
-
-################################################################################
-#                                                                              #
-#                                  M A I N                                     #
-#                                                                              #
-################################################################################
-
+#====================================================================================================
+#  M A I N
+#====================================================================================================
+# Use this for testing purposes or as a script. 
+# Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]
 if __name__ == '__main__':
-    """
-    __main__
-
-    For testing purpose only.
-    """
-    popdb = PopDBAPI()
+    if len(sys.argv) < 2:
+        print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+        sys.exit(2)
+    popdb = popDB()
+    func = getattr(popdb, sys.argv[1])
+    if not func:
+        print "%s is not a valid popularity db api call" % (sys.argv[1])
+        print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+        sys.exit(3)
+    args = dict()
+    for arg in sys.argv[2:]:
+        try:
+            a, v = arg.split(':')
+        except ValueError, e:
+            print "Passed argument %s does not follow the correct usage" % (arg)
+            print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+            sys.exit(2)
+        args[a] = v
     popdb.renewSSOCookie()
-    tstop = datetime.date.today()
-    tstart = tstop - datetime.timedelta(days=3)
-    check, data = popdb.getDSStatInTimeWindow(tstart=tstart, tstop=tstop)
-    if check:
-        sys.exit(1)
-        #print data
+    try:
+        func(**args)
+    except TypeError, e:
+        print e
+        print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+        sys.exit(3)
     sys.exit(0)
