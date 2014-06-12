@@ -98,12 +98,12 @@ class popDB():
         return self.call(url, values)
 
     def getUserStat(self, tstart='', tstop='', collname='', orderby=''):
-        values = {'tstart':tstart, 'tstop':tstop, 'collname':collname, 'orderby'=orderby}
+        values = {'tstart':tstart, 'tstop':tstop, 'collname':collname, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getUserStat"))
         return self.call(url, values)
 
     def getCorruptedFiles(self, sitename='', orderby=''):
-        values = {'sitename':sitename, 'orderby'=orderby}
+        values = {'sitename':sitename, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getCorruptedFiles"))
         return self.call(url, values)
 
