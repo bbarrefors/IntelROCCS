@@ -16,7 +16,7 @@
 # In case of error an exception is thrown. This needs to be dealt with by the caller.
 #
 #---------------------------------------------------------------------------------------------------
-import sys, os, re, urllib, urllib2, httplib, time, datetime
+import sys, urllib, urllib2, httplib
 try:
     import json
 except ImportError:
