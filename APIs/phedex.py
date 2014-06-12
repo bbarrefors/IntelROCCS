@@ -33,14 +33,16 @@ class phedex:
         data = urllib.urlencode(values)
         opener = urllib2.build_opener(HTTPSGridAuthHandler())
         request = urllib2.Request(url, data)
+        strout = ""
         try:
             strout = opener.open(request)
         except urllib2.HTTPError, e:
-            raise Exception("FATAL - phedex failure, HTTP status code %s" % (str(strout.getCode())))
+            raise Exception("FATAL - phedex failure: %s" % (str(e)))
         except urllib2.URLError, e:
-            raise Exception("FATAL - phedex failure, HTTP status code %s" % (str(strout.getCode())))
+            raise Exception("FATAL - phedex failure: %s" % (str(e)))
         try:
-            json_data = json.loads(strout)
+            response = strout.read()
+            json_data = json.loads(response)
         except ValueError, e:
             raise Exception("FATAL - phedex failure, reason: %s" % (str(strout)))
         return json_data
@@ -120,11 +122,11 @@ class HTTPSGridAuthHandler(urllib2.HTTPSHandler):
 # Use this for testing purposes or as a script.
 # Usage: python ./phedex.py <apiCall> <instance> [arg1_name:'arg1' arg2_name:'arg2' ...]
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print "Usage: python ./phedex.py <apiCall> [arg1_name:'arg1' arg2_name:'arg2' ...]"
         sys.exit(2)
-    phedex = phedex()
-    func = getattr(phedex, sys.argv[1], None)
+    phdx = phedex()
+    func = getattr(phdx, sys.argv[1], None)
     if not func:
         print "%s is not a valid phedex api call" % (sys.argv[1])
         print "Usage: python ./phedex.py <apiCall> [arg1_name:'arg1' arg2_name:'arg2' ...]"
