@@ -14,12 +14,11 @@
 # SSO cookie is valid for 24h.
 #
 #---------------------------------------------------------------------------------------------------
-import sys, os, re, urllib, urllib2, httplib, time, datetime, subprocess
+import sys, os, re, urllib, urllib2, subprocess
 try:
     import json
 except ImportError:
     import simplejson as json
-from subprocess import call, Popen, PIPE
 
 class popDB():
     def __init__(self):
@@ -43,7 +42,10 @@ class popDB():
         strout, error = process.communicate()
         if process.returncode != 0:
             raise Exception("FATAL - popularity failure, exit status %s" % (str(process.returncode)))
-        return json.loads(strout)
+        try:
+            json_data = json.loads(strout)
+        except ValueError, e:
+            raise Exception("FATAL - popularity failure, reason: %s" % (str(strout)))            
 
 #===================================================================================================
 #  A P I   C A L L S
@@ -63,7 +65,7 @@ if __name__ == '__main__':
         print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
         sys.exit(2)
     popdb = popDB()
-    func = getattr(popdb, sys.argv[1])
+    func = getattr(popdb, sys.argv[1], None)
     if not func:
         print "%s is not a valid popularity db api call" % (sys.argv[1])
         print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
