@@ -6,12 +6,13 @@
 #
 # Use SSO cookie to avoid password 
 # (http://linux.web.cern.ch/linux/docs/cernssocookie.shtml)
-#
-# The API doesn't check to make sure correct values are passed or that any values are passed. All
-# such checks needs to be done by the caller.
-#
 # It is up to the caller to make sure a valid SSO cookie is obtained before any calls are made. A
 # SSO cookie is valid for 24h.
+#
+# The API doesn't check to make sure correct values are passed or that rquired parameters are 
+# passed. All such checks needs to be done by the caller.
+#
+# In case of error an exception is thrown. This needs to be dealt with by the caller.
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os, re, urllib, urllib2, subprocess
@@ -45,7 +46,8 @@ class popDB():
         try:
             json_data = json.loads(strout)
         except ValueError, e:
-            raise Exception("FATAL - popularity failure, reason: %s" % (str(strout)))            
+            raise Exception("FATAL - popularity failure, reason: %s" % (str(strout)))
+        return json_data
 
 #===================================================================================================
 #  A P I   C A L L S
@@ -101,7 +103,7 @@ class popDB():
         return self.call(url, values)
 
     def getCorruptedFiles(self, sitename='', orderby=''):
-        values = {sitename':sitename, 'orderby'=orderby}
+        values = {'sitename':sitename, 'orderby'=orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getCorruptedFiles"))
         return self.call(url, values)
 
@@ -109,16 +111,16 @@ class popDB():
 #  M A I N
 #====================================================================================================
 # Use this for testing purposes or as a script. 
-# Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]
+# Usage: python ./popDB.py <APICall> [arg1_name:'arg1' arg2_name:'arg2' ...]
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+        print "Usage: python ./popDB.py <APICall> [arg1_name:'arg1' arg2_name:'arg2' ...]"
         sys.exit(2)
     popdb = popDB()
     func = getattr(popdb, sys.argv[1], None)
     if not func:
         print "%s is not a valid popularity db api call" % (sys.argv[1])
-        print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+        print "Usage: python ./popDB.py <APICall> [arg1_name:'arg1' arg2_name:'arg2' ...]"
         sys.exit(3)
     args = dict()
     for arg in sys.argv[2:]:
@@ -126,7 +128,7 @@ if __name__ == '__main__':
             a, v = arg.split(':')
         except ValueError, e:
             print "Passed argument %s does not follow the correct usage" % (arg)
-            print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+            print "Usage: python ./popDB.py <APICall> [arg1_name:'arg1' arg2_name:'arg2' ...]"
             sys.exit(2)
         args[a] = v
     popdb.renewSSOCookie()
@@ -134,7 +136,7 @@ if __name__ == '__main__':
         data = func(**args)
     except TypeError, e:
         print e
-        print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
+        print "Usage: python ./popDB.py <APICall> [arg1_name:'arg1' arg2_name:'arg2' ...]"
         sys.exit(3)
     print data
     sys.exit(0)
