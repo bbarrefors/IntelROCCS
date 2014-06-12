@@ -50,9 +50,59 @@ class popDB():
 #===================================================================================================
 #  A P I   C A L L S
 #===================================================================================================
+    def getDSdata(self, tstart='', tstop='', sitename='', aggr='', n='', orderby=''):
+        values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename, 'aggr':aggr, 'n':n, 'orderby':orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getDSdata"))
+        return self.call(url, values)
+
+    def getDTdata(self, tstart='', tstop='', sitename='', aggr='', orderby=''):
+        values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename, 'aggr':aggr, 'n':n, 'orderby':orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getDTdata"))
+        return self.call(url, values)
+
+    def getDSNdata(self, tstart='', tstop='', sitename='', aggr='', orderby=''):
+        values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename, 'aggr':aggr, 'n':n, 'orderby':orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getDSNdata"))
+        return self.call(url, values)
+
+    def getSingleDSstat(self, name='', sitename='', aggr='', orderby=''):
+        values = {'name':name, 'sitename':sitename, 'aggr':aggr, 'orderby':orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getSingleDSstat"))
+        return self.call(url, values)
+
+    def getSingleDTstat(self, name='', sitename='', aggr='', orderby=''):
+        values = {'name':name, 'sitename':sitename, 'aggr':aggr, 'orderby':orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getSingleDTstat"))
+        return self.call(url, values)
+
+    def getSingleDNstat(self, name='', sitename='', aggr='', orderby=''):
+        values = {'name':name, 'sitename':sitename, 'aggr':aggr, 'orderby':orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getSingleDNstat"))
+        return self.call(url, values)
+
     def DSStatInTimeWindow(self, tstart='', tstop='', sitename=''):
-        values = { 'sitename' : sitename, 'tstart' : tstart, 'tstop' : tstop }
+        values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DSStatInTimeWindow"))
+        return self.call(url, values)
+
+    def DataTierStatInTimeWindow(self, tstart='', tstop='', sitename=''):
+        values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DataTierStatInTimeWindow"))
+        return self.call(url, values)
+
+    def DSNameStatInTimeWindow(self, tstart='', tstop='', sitename=''):
+        values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DSNameStatInTimeWindow"))
+        return self.call(url, values)
+
+    def getUserStat(self, tstart='', tstop='', collname='', orderby=''):
+        values = {'tstart':tstart, 'tstop':tstop, 'collname':collname, 'orderby'=orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getUserStat"))
+        return self.call(url, values)
+
+    def getCorruptedFiles(self, sitename='', orderby=''):
+        values = {sitename':sitename, 'orderby'=orderby}
+        url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getCorruptedFiles"))
         return self.call(url, values)
 
 #====================================================================================================
@@ -81,9 +131,10 @@ if __name__ == '__main__':
         args[a] = v
     popdb.renewSSOCookie()
     try:
-        func(**args)
+        data = func(**args)
     except TypeError, e:
         print e
         print "Usage: python ./popDB.py <api_call> [arg1_name:'arg1' arg2_name:'arg2' ...]"
         sys.exit(3)
+    print data
     sys.exit(0)
