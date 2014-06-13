@@ -116,9 +116,9 @@ class HTTPSGridAuthHandler(urllib2.HTTPSHandler):
     def getConnection(self, host, timeout=300):
         return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
-#====================================================================================================
+#===================================================================================================
 #  M A I N
-#====================================================================================================
+#===================================================================================================
 # Use this for testing purposes or as a script.
 # Usage: python ./phedex.py <apiCall> <instance> [arg1_name:arg1 arg2_name:arg2 ...]
 if __name__ == '__main__':
