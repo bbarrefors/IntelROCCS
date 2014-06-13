@@ -7,7 +7,7 @@
 # Use SSO cookie to avoid password 
 # (http://linux.web.cern.ch/linux/docs/cernssocookie.shtml)
 # It is up to the caller to make sure a valid SSO cookie is obtained before any calls are made. A
-# SSO cookie is valid for 24h.
+# SSO cookie is valid for 24h. Requires myCert.key and myCert.pem stored in BASEDIR/certs/
 #
 # The API doesn't check to make sure correct values are passed or that rquired parameters are 
 # passed. All such checks needs to be done by the caller.

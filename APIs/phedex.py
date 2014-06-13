@@ -4,7 +4,7 @@
 # Python interface to access PhEDEx online API. See website for API documentation
 # (https://cmsweb.cern.ch/phedex/datasvc/doc)
 #
-# Use grid-proxy-init to aquire a valid CERN proxy, proxy's are only valid for a limited time.
+# Use grid-proxy-init to aquire a valid CERN proxy, proxy's are only valid for a limited time. grid-proxy-init requires usercert.pem and userkey.key in ~/.globus/
 # It is up to the caller to make sure a valid CERN proxy is available.
 #
 # The API doesn't check to make sure correct values are passed or that rquired parameters are 

@@ -1,7 +1,15 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
 #
-# dbAccess
+# Access to MIT database. IP address of machine where script is on need to have permission to access
+# the database. Requires a login file with base64 encoded values for host, database, username, and 
+# password stored in BASEDIR/db/
+#
+# Returns a list with touples of the data requested. Example of what should be passed:
+# query="SELECT * WHERE DatasetName=%s", values=touple("Dataset1")
+# Values are optional
+#
+# In case of error an exception is thrown. This needs to be dealt with by the caller.
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os, base64, MySQLdb
@@ -19,7 +27,7 @@ class dbAccess():
 #===================================================================================================
 #  H E L P E R S
 #===================================================================================================
-    def dbQuery(self, query, values):
+    def dbQuery(self, query, values=()):
         data = []
         try:
             with self.DB_CON:
@@ -42,12 +50,12 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print "Usage: python ./dbAccess.py <'db query'> ['value1', 'value2', ...]"
         sys.exit(2)
-    mit_db = dbAccess()
+    dbAcc = dbAccess()
     query = sys.argv[1]
     values = []
     for v in sys.argv[2:]:
         values.append(v)
     values = tuple(values)
-    data = mit_db.dbQuery(query, values)
+    data = dbAcc.dbQuery(query, values=values)
     print data
     sys.exit(0)
