@@ -29,6 +29,7 @@ class dbAccess():
 #===================================================================================================
     def dbQuery(self, query, values=()):
         data = []
+        values = tuple([str(value) for value in values])
         try:
             with self.DB_CON:
                 cur = self.DB_CON.cursor()
