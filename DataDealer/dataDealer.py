@@ -11,7 +11,7 @@
 import sys, os
 BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 for root, dirs, files in os.walk(BASEDIR):
-	sys.path.append(root)
+    sys.path.append(root)
 import popDB, phedex, getSites
 
 # Setup parameters

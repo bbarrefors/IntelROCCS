@@ -16,9 +16,9 @@ import sys, os, base64, MySQLdb
 
 class dbAccess():
     def __init__(self):
-    	self.BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-    	db_file = open('%s/db/login' % (self.BASEDIR))
-    	self.HOST = base64.b64decode(db_file.readline().strip())
+        self.BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+        db_file = open('%s/db/login' % (self.BASEDIR))
+        self.HOST = base64.b64decode(db_file.readline().strip())
         self.DB = base64.b64decode(db_file.readline().strip())
         self.USER = base64.b64decode(db_file.readline().strip())
         self.PASSWD = base64.b64decode(db_file.readline().strip())
