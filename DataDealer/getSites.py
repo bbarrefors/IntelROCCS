@@ -18,17 +18,26 @@ class getSites():
 #  H E L P E R S
 #===================================================================================================
 	def getAllSites(self):
-		query = "SELECT DatasetName FROM Sites"
+		# Change query when tables are updated
+		#query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s"
+		query = "SELECT SiteName FROM Quotas WHERE GroupName=%s"
+		values = ('analysisOps')
 		data = dbAcc.dbQuery(query)
 		return [site[0] for site in data]
 
 	def getBlacklistedSites(self):
-		query = "SELECT DatasetName FROM SiteBlacklist"
+		# Change query when tables are updated
+		#query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
+		query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
+		values = ('AnalysisOps', '0')
 		data = dbAcc.dbQuery(query)
 		return [site[0] for site in data]
 
 	def getAvailableSites(self):
-		query = "SELECT Sites.DatasetName FROM Sites LEFT JOIN SiteBlacklist ON Sites.SiteId = SiteBlacklist.SiteId WHERE SiteBlacklist.SiteId IS NULL"
+		# Change query when tables are updated
+		#query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
+		query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
+		values = ('AnalysisOps', '1')
 		data = dbAcc.dbQuery(query)
 		return [site[0] for site in data]
 
