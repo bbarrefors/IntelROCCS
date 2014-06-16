@@ -4,7 +4,7 @@
 # 
 #
 #---------------------------------------------------------------------------------------------------
-import sys
+import sys, os
 BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 for root, dirs, files in os.walk(BASEDIR):
     sys.path.append(root)
@@ -21,24 +21,24 @@ class getSites():
         # Change query when tables are updated
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s"
-        values = ('analysisOps')
-        data = dbAcc.dbQuery(query)
+        values = ["analysisOps"]
+        data = self.dbAcc.dbQuery(query, values=tuple(values))
         return [site[0] for site in data]
 
     def getBlacklistedSites(self):
         # Change query when tables are updated
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
-        values = ('AnalysisOps', '0')
-        data = dbAcc.dbQuery(query)
+        values = ['AnalysisOps', '0']
+        data = self.dbAcc.dbQuery(query, values=tuple(values))
         return [site[0] for site in data]
 
     def getAvailableSites(self):
         # Change query when tables are updated
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
-        values = ('AnalysisOps', '1')
-        data = dbAcc.dbQuery(query)
+        values = ['AnalysisOps', '1']
+        data = self.dbAcc.dbQuery(query, values=tuple(values))
         return [site[0] for site in data]
 
 #===================================================================================================
@@ -57,5 +57,6 @@ if __name__ == '__main__':
         print "Usage: python ./getSites.py <function>"
         sys.exit(3)
     data = func()
+    print len(data)
     print data
     sys.exit(0)
