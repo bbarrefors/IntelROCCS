@@ -1,7 +1,8 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
 #
-# 
+# Queries database to get all sites on which AnalysisOps have quota. Can also return only those that
+# are currently not blacklisted or those that are currently blacklisted.
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os
@@ -19,7 +20,7 @@ class getSites():
 #===================================================================================================
     def getAllSites(self):
         # Change query when tables are updated
-        #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s"
+        #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s"
         values = ["analysisOps"]
         data = self.dbAcc.dbQuery(query, values=tuple(values))
@@ -27,7 +28,7 @@ class getSites():
 
     def getBlacklistedSites(self):
         # Change query when tables are updated
-        #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
+        #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
         values = ['AnalysisOps', '0']
         data = self.dbAcc.dbQuery(query, values=tuple(values))
@@ -35,7 +36,7 @@ class getSites():
 
     def getAvailableSites(self):
         # Change query when tables are updated
-        #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId = Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId = Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
+        #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
         values = ['AnalysisOps', '1']
         data = self.dbAcc.dbQuery(query, values=tuple(values))
