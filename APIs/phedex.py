@@ -123,28 +123,28 @@ class HTTPSGridAuthHandler(urllib2.HTTPSHandler):
 # Usage: python ./phedex.py <apiCall> <instance> [arg1_name:arg1 arg2_name:arg2 ...]
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "Usage: python ./phedex.py <apiCall> [arg1_name:arg1 arg2_name:arg2 ...]"
+        print "Usage: python ./phedex.py <apiCall> [arg1_name=arg1 arg2_name=arg2 ...]"
         sys.exit(2)
     phdx = phedex()
     func = getattr(phdx, sys.argv[1], None)
     if not func:
         print "%s is not a valid phedex api call" % (sys.argv[1])
-        print "Usage: python ./phedex.py <apiCall> [arg1_name:arg1 arg2_name:arg2 ...]"
+        print "Usage: python ./phedex.py <apiCall> [arg1_name=arg1 arg2_name=arg2 ...]"
         sys.exit(3)
     args = dict()
     for arg in sys.argv[2:]:
         try:
-            a, v = arg.split(':')
+            a, v = arg.split('=')
         except ValueError, e:
             print "Passed argument %s does not follow the correct usage" % (arg)
-            print "Usage: python ./phedex.py <apiCall> [arg1_name:arg1 arg2_name:arg2 ...]"
+            print "Usage: python ./phedex.py <apiCall> [arg1_name=arg1 arg2_name=arg2 ...]"
             sys.exit(2)
         args[a] = v
     try:
         data = func(**args)
     except TypeError, e:
         print e
-        print "Usage: python ./phedex.py <apiCall> [arg1_name:arg1 arg2_name:arg2 ...]"
+        print "Usage: python ./phedex.py <apiCall> [arg1_name=arg1 arg2_name=arg2 ...]"
         sys.exit(3)
     print data
     sys.exit(0)
