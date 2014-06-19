@@ -13,7 +13,7 @@ import dbAccess
 
 class getSites():
     def __init__(self):
-        self.dbAcc = dbAccess.dbAccess()
+        self.dbaccess = dbAccess.dbAccess()
 
 #===================================================================================================
 #  H E L P E R S

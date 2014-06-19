@@ -15,7 +15,7 @@ import dbAccess, phedex
 
 class updateReplicasDB():
     def __init__(self):
-        self.dbAcc = dbAccess.dbAccess()
+        self.dbaccess = dbAccess.dbAccess()
         self.phdx = phedex.phedex()
 
 #===================================================================================================
@@ -36,7 +36,7 @@ class updateReplicasDB():
 
     def updateReplicas(self):
         newReplicas = dict()
-        json_data = self.phdx.blockReplicas(self, group='AnalysisOps', show_dataset='y', created_since='')
+        json_data = self.phdx.blockReplicas(self, group='AnalysisOps', show_dataset='y', created_since='0')
         data = json_data.get('phedex').get('dataset')
         for d in data:
             dataset = d.get('name')

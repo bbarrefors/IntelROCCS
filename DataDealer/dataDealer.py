@@ -18,20 +18,17 @@ import popDB, phedex, getSites, updateReplicasDB, datasetRanking
 # We would like to make these easier to change in the future
 popdb = popDB.popDB()
 phdx = phedex.phedex()
-siteReq = getSites.getSites()
-updateReplicas = updateReplicasDB.updateReplicas()
-dsetRank = datasetRanking.datasetRanking()
+getsites = getSites.getSites()
+updatereplicasdb = updateReplicasDB.updateReplicas()
+datasetranking = datasetRanking.datasetRanking()
 #===================================================================================================
 #  M A I N
 #===================================================================================================
 # Set up valid certificate and proxy for Popularity DB and PhEDEx
 popdb.renewSSOCookie()
 subprocess.call(["grid-proxy-init", "-valid", "24:00"])
-availableSites = siteReq.getAvailableSites()
-dbUpdate.updateReplicas()
-# {dataset:ranking, ...}
-datasetRankings = dsetRank.getRankings()
-# {dataset:{'replicas':replicas, 'size':size, 'n_accesses':n_accesses, 'd_accesses':d_accesss}, ...}
-# This will be changed as the ranking algorithm changes
-datasetStats = dsetRank.getStats()
+availableSites = getsites.getAvailableSites()
+updatereplicasdb.updateReplicas()
+datasetRankings = datasetranking.getRankings()
+# {dataset:{'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}, ...}
 sys.exit(0)
