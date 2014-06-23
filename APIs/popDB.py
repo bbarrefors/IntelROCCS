@@ -39,6 +39,7 @@ class popDB():
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
         full_url = request.get_full_url() + request.get_data()
+        print full_url
         process = subprocess.Popen(["curl", "-k", "-s", "-L", "--cookie", self.COOKIE, "--cookie-jar", self.COOKIE, full_url], stdout=subprocess.PIPE)
         strout, error = process.communicate()
         if process.returncode != 0:

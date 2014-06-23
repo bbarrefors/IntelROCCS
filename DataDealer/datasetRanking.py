@@ -11,19 +11,19 @@ import sys, os, datetime
 BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 for root, dirs, files in os.walk(BASEDIR):
     sys.path.append(root)
-import phedex, dbAccess, popDb
+import phedex, dbAccess, popDB
 
 class datasetRanking():
     def __init__(self):
         self.dbaccess = dbAccess.dbAccess()
         self.phdx = phedex.phedex()
-        self.popdb = popDb.popDb()
+        self.popdb = popDB.popDB()
 
 #===================================================================================================
 #  H E L P E R S
 #===================================================================================================
     def getReplicas(self, dataset):
-        json_data = self.phdx.blockReplicas(self, dataset=dataset, group='AnalysisOps', show_dataset='y', created_since='0')
+        json_data = self.phdx.blockReplicas(dataset=dataset, group='AnalysisOps', show_dataset='y', create_since='0')
         data = json_data.get('phedex').get('dataset')[0]
         replicas = 0
         for replica in data.get('block')[0].get('replica'):
@@ -31,7 +31,7 @@ class datasetRanking():
         return replicas
 
     def getSize(self, dataset):
-        json_data = self.phdx.data(self, dataset=dataset, level='block', created_since='0')
+        json_data = self.phdx.data(dataset=dataset, level='block', create_since='0')
         data = json_data.get('phedex').get('dbs')[0].get('dataset')[0].get('block')
         size = float(0)
         for block in data:
@@ -66,9 +66,9 @@ class datasetRanking():
     def getRankings(self):
         # Example: {'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}
         rankings = dict()
-        query = "SELECT Datasets.DatasetName FROM(SELECT * FROM Replicas ORDER BY Date DESC) r GROUP BY DatasetId INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId"
-        data = self.dbAcc.dbQuery(query)
-        for dataset in data:
+        query = "SELECT r.DatasetName FROM (SELECT Datasets.DatasetId, Datasets.DatasetName, Replicas.Date, Replicas.Replicas FROM Replicas INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId ORDER BY Replicas.Date DESC) r GROUP BY r.DatasetId"
+        data = self.dbaccess.dbQuery(query)
+        for dataset in (d[0] for d in data):
             rank = 0
             replicas = self.getReplicas(dataset)
             size = self.getSize(dataset)
@@ -87,7 +87,7 @@ class datasetRanking():
 # Use this for testing purposes or as a script. 
 # Usage: python ./datasetRanking.py
 if __name__ == '__main__':
-    if not (len(sys.argv) == 4):
+    if not (len(sys.argv) == 1):
         print "Usage: python ./datasetRanking.py"
         sys.exit(2)
     datasetranking = datasetRanking()

@@ -33,13 +33,14 @@ class phedex:
         data = urllib.urlencode(values)
         opener = urllib2.build_opener(HTTPSGridAuthHandler())
         request = urllib2.Request(url, data)
+        full_url = request.get_full_url() + request.get_data()
         strout = ""
         try:
             strout = opener.open(request)
         except urllib2.HTTPError, e:
-            raise Exception("FATAL - phedex failure: %s" % (str(e)))
+            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(full_url)))
         except urllib2.URLError, e:
-            raise Exception("FATAL - phedex failure: %s" % (str(e)))
+            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(full_url)))
         try:
             response = strout.read()
             json_data = json.loads(response)
