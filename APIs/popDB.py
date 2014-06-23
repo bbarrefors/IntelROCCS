@@ -52,47 +52,47 @@ class popDB():
 #===================================================================================================
 #  A P I   C A L L S
 #===================================================================================================
-    def getDSdata(self, tstart='', tstop='', sitename='', aggr='', n='', orderby=''):
+    def getDSdata(self, tstart='', tstop='', sitename='summary', aggr='', n='', orderby=''):
         values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename, 'aggr':aggr, 'n':n, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getDSdata"))
         return self.call(url, values)
 
-    def getDTdata(self, tstart='', tstop='', sitename='', aggr='', orderby=''):
+    def getDTdata(self, tstart='', tstop='', sitename='summary', aggr='', orderby=''):
         values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename, 'aggr':aggr, 'n':n, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getDTdata"))
         return self.call(url, values)
 
-    def getDSNdata(self, tstart='', tstop='', sitename='', aggr='', orderby=''):
+    def getDSNdata(self, tstart='', tstop='', sitename='summary', aggr='', orderby=''):
         values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename, 'aggr':aggr, 'n':n, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getDSNdata"))
         return self.call(url, values)
 
-    def getSingleDSstat(self, name='', sitename='', aggr='', orderby=''):
+    def getSingleDSstat(self, name='', sitename='summary', aggr='', orderby=''):
         values = {'name':name, 'sitename':sitename, 'aggr':aggr, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getSingleDSstat"))
         return self.call(url, values)
 
-    def getSingleDTstat(self, name='', sitename='', aggr='', orderby=''):
+    def getSingleDTstat(self, name='', sitename='summary', aggr='', orderby=''):
         values = {'name':name, 'sitename':sitename, 'aggr':aggr, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getSingleDTstat"))
         return self.call(url, values)
 
-    def getSingleDNstat(self, name='', sitename='', aggr='', orderby=''):
+    def getSingleDNstat(self, name='', sitename='summary', aggr='', orderby=''):
         values = {'name':name, 'sitename':sitename, 'aggr':aggr, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getSingleDNstat"))
         return self.call(url, values)
 
-    def DSStatInTimeWindow(self, tstart='', tstop='', sitename=''):
+    def DSStatInTimeWindow(self, tstart='', tstop='', sitename='summary'):
         values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DSStatInTimeWindow"))
         return self.call(url, values)
 
-    def DataTierStatInTimeWindow(self, tstart='', tstop='', sitename=''):
+    def DataTierStatInTimeWindow(self, tstart='', tstop='', sitename='summary'):
         values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DataTierStatInTimeWindow"))
         return self.call(url, values)
 
-    def DSNameStatInTimeWindow(self, tstart='', tstop='', sitename=''):
+    def DSNameStatInTimeWindow(self, tstart='', tstop='', sitename='summary'):
         values = {'tstart':tstart, 'tstop':tstop, 'sitename':sitename}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("DSNameStatInTimeWindow"))
         return self.call(url, values)
@@ -102,7 +102,7 @@ class popDB():
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getUserStat"))
         return self.call(url, values)
 
-    def getCorruptedFiles(self, sitename='', orderby=''):
+    def getCorruptedFiles(self, sitename='summary', orderby=''):
         values = {'sitename':sitename, 'orderby':orderby}
         url = urllib.basejoin(self.POPDB_BASE, "%s/?&" % ("getCorruptedFiles"))
         return self.call(url, values)

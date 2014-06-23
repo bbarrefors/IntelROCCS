@@ -66,7 +66,7 @@ class datasetRanking():
     def getRankings(self):
         # Example: {'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}
         rankings = dict()
-        query = "SELECT Datasets.DatasetName FROM(SELECT * FROM Replicas ORDER BY Date DESC) r GROUP BY DatasetId INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId"
+        query = "SELECT r.DatasetName FROM (SELECT Datasets.DatasetId, Datasets.DatasetName, Replicas.Date, Replicas.Replicas FROM Replicas INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId ORDER BY Replicas.Date DESC) r GROUP BY r.DatasetId"
         data = self.dbAcc.dbQuery(query)
         for dataset in data:
             rank = 0
