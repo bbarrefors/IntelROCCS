@@ -47,24 +47,23 @@ class datasetRanking():
         size = size / 10**9
         return int(size)
 
-    def getAccesses(self, dataset):
+    def getAccesses(self, rankings):
         # Get number of accesses for the last 5 days
         # Example: {'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}
         accesses = dict()
-        try:
-            json_data = self.popdb.getSingleDSstat(name=dataset, aggr='day', orderby='naccess')
-        except Exception, e:
-            return None
-        data = json_data.get('data')[0].get('data')
-        data = sorted(data, reverse=True, key=lambda date: date[0])
-        yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        last_report = datetime.datetime.utcfromtimestamp(int(int(data[0][0])/1000)).strftime('%Y-%m-%d')
-        if yesterday == last_report and len(data) >= 5:
-            for i in range(5):
-                accesses[datetime.datetime.utcfromtimestamp(int(int(data[i][0])/1000)).strftime('%Y-%m-%d')] = data[i][1]
-        else:
-            return None
-        return accesses
+        for d in range(1,6):
+            tstart = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+            tstop = tstart
+            try:
+                json_data = self.popdb.DSStatInTimeWindow(tstart=tstart, tstop=tstop)
+            except Exception, e:
+                return None
+            data = json_data.get('data')[0]
+            for d in data:
+                dataset = d.get('COLLNAME')
+                if dataset in rankings:
+                    rankings[dataset]['accesses'][tstart] = d.get('NACC')
+        return rankings
 
     def getNaiveRank(self, replicas, size, accesses):
         # rank = (log(n_accesses)*d_accesses)/(size*relpicas^2)
@@ -87,11 +86,16 @@ class datasetRanking():
             size = self.getSize(dataset)
             if not size:
                 continue
-            accesses = self.getAccesses(dataset)
-            if not accesses:
-                continue
-            rank = self.getNaiveRank(replicas, size, accesses)
-            rankings[dataset] = {'rank':rank, 'replicas':replicas, 'size':size, 'accesses':accesses}
+            # Dummy accesses
+            accesses = dict()
+            for i in range(1, 6):
+                date = (datetime.date.today() - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+                accesses[date] = 1
+            rankings[dataset] = {'replicas':replicas, 'size':size, 'accesses':accesses}
+        rankings = self.getAccesses(rankings)
+        for dataset in iter(rankings):
+            rank = self.getNaiveRank(rankings[dataset]['replicas'], rankings[dataset]['size'], rankings[dataset]['accesses'])
+            rankings[dataset]['rank'] = rank
         return rankings
 
 
