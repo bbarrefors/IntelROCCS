@@ -23,16 +23,23 @@ class datasetRanking():
 #  H E L P E R S
 #===================================================================================================
     def getReplicas(self, dataset):
-        json_data = self.phdx.blockReplicas(dataset=dataset, group='AnalysisOps', show_dataset='y', create_since='0')
-        data = json_data.get('phedex').get('dataset')[0]
         replicas = 0
-        for replica in data.get('block')[0].get('replica'):
-            replicas += 1
+        try:
+            json_data = self.phdx.blockReplicas(dataset=dataset, group='AnalysisOps', show_dataset='y', create_since='0')
+            data = json_data.get('phedex').get('dataset')[0]
+            for replica in data.get('block')[0].get('replica'):
+                replicas += 1
+        except Exception, e:
+            # TODO : Print to log
+            return None
         return replicas
 
     def getSize(self, dataset):
-        json_data = self.phdx.data(dataset=dataset, level='block', create_since='0')
-        data = json_data.get('phedex').get('dbs')[0].get('dataset')[0].get('block')
+        try:
+            json_data = self.phdx.data(dataset=dataset, level='block', create_since='0')
+            data = json_data.get('phedex').get('dbs')[0].get('dataset')[0].get('block')
+        except Exception, e:
+            return None
         size = float(0)
         for block in data:
             size += block.get('bytes')
@@ -44,22 +51,27 @@ class datasetRanking():
         # Get number of accesses for the last 5 days
         # Example: {'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}
         accesses = dict()
-        json_data = self.popdb.getSingleDSstat(name=dataset, aggr='day', orderby='naccess')
-        data = json_data.get('data')[0].get('data')[0]
-        data = sorted(data, reversed=True, key=lambda date: date[0])
+        try:
+            json_data = self.popdb.getSingleDSstat(name=dataset, aggr='day', orderby='naccess')
+        except Exception, e:
+            return None
+        data = json_data.get('data')[0].get('data')
+        data = sorted(data, reverse=True, key=lambda date: date[0])
         yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         last_report = datetime.datetime.utcfromtimestamp(int(int(data[0][0])/1000)).strftime('%Y-%m-%d')
-        if yesterday == last_report:
+        if yesterday == last_report and len(data) >= 5:
             for i in range(5):
                 accesses[datetime.datetime.utcfromtimestamp(int(int(data[i][0])/1000)).strftime('%Y-%m-%d')] = data[i][1]
+        else:
+            return None
         return accesses
 
     def getNaiveRank(self, replicas, size, accesses):
+        # rank = (log(n_accesses)*d_accesses)/(size*relpicas^2)
         tstart = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
         tstop = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         n_accesses = accesses[tstart]
         d_accesses = max(accesses[tstop] - accesses[tstart], 1)
-        # rank = (log(n_accesses)*d_accesses)/(size*relpicas^2)
         rank = (math.log10(n_accesses)*d_accesses)(size*replicas**2)
         return rank
 
@@ -69,14 +81,16 @@ class datasetRanking():
         query = "SELECT r.DatasetName FROM (SELECT Datasets.DatasetId, Datasets.DatasetName, Replicas.Date, Replicas.Replicas FROM Replicas INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId ORDER BY Replicas.Date DESC) r GROUP BY r.DatasetId"
         data = self.dbaccess.dbQuery(query)
         for dataset in (d[0] for d in data):
-            rank = 0
             replicas = self.getReplicas(dataset)
-            size = self.getSize(dataset)
-            accesses = self.getAccesses(dataset)
-            if (replicas and size and accesses):
-                rank = self.getNaiveRank(replicas, size, accesses)
-            else:
+            if not replicas:
                 continue
+            size = self.getSize(dataset)
+            if not size:
+                continue
+            accesses = self.getAccesses(dataset)
+            if not accesses:
+                continue
+            rank = self.getNaiveRank(replicas, size, accesses)
             rankings[dataset] = {'rank':rank, 'replicas':replicas, 'size':size, 'accesses':accesses}
         return rankings
 

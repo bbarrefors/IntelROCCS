@@ -39,15 +39,14 @@ class popDB():
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
         full_url = request.get_full_url() + request.get_data()
-        print full_url
         process = subprocess.Popen(["curl", "-k", "-s", "-L", "--cookie", self.COOKIE, "--cookie-jar", self.COOKIE, full_url], stdout=subprocess.PIPE)
         strout, error = process.communicate()
         if process.returncode != 0:
-            raise Exception("FATAL - popularity failure, exit status %s" % (str(process.returncode)))
+            raise Exception("FATAL - popularity failure, exit status %s\n URL - %s" % (str(process.returncode), str(full_url)))
         try:
             json_data = json.loads(strout)
         except ValueError, e:
-            raise Exception("FATAL - popularity failure, reason: %s" % (str(strout)))
+            raise Exception("FATAL - popularity failure, reason: %s\n URL - %s" % (str(strout), str(full_url)))
         return json_data
 
 #===================================================================================================
