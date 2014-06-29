@@ -113,10 +113,12 @@ class popDB():
 # Use this for testing purposes or as a script. 
 # Usage: python ./popDB.py <APICall> ['arg1_name=arg1' 'arg2_name=arg2' ...]
 if __name__ == '__main__':
+    popdb = popDB()
+    popdb.renewSSOCookie()
+    print "Updated SSO cookie"
     if len(sys.argv) < 2:
         print "Usage: python ./popDB.py <APICall> ['arg1_name=arg1' 'arg2_name=arg2' ...]"
         sys.exit(2)
-    popdb = popDB()
     func = getattr(popdb, sys.argv[1], None)
     if not func:
         print "%s is not a valid popularity db api call" % (sys.argv[1])
@@ -131,7 +133,6 @@ if __name__ == '__main__':
             print "Usage: python ./popDB.py <APICall> ['arg1_name=arg1' 'arg2_name=arg2' ...]"
             sys.exit(2)
         args[a] = v
-    popdb.renewSSOCookie()
     try:
         data = func(**args)
     except TypeError, e:

@@ -7,7 +7,7 @@
 # is thrown which is currently not caught.
 #
 #---------------------------------------------------------------------------------------------------
-import sys, os, datetime
+import sys, os, datetime, math
 BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 for root, dirs, files in os.walk(BASEDIR):
     sys.path.append(root)
@@ -50,7 +50,6 @@ class datasetRanking():
     def getAccesses(self, rankings):
         # Get number of accesses for the last 5 days
         # Example: {'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}
-        accesses = dict()
         for d in range(1,6):
             tstart = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
             tstop = tstart
@@ -58,10 +57,11 @@ class datasetRanking():
                 json_data = self.popdb.DSStatInTimeWindow(tstart=tstart, tstop=tstop)
             except Exception, e:
                 return None
-            data = json_data.get('data')[0]
+            data = json_data.get('DATA')
             for d in data:
                 dataset = d.get('COLLNAME')
                 if dataset in rankings:
+                    print "Foobar"
                     rankings[dataset]['accesses'][tstart] = d.get('NACC')
         return rankings
 
@@ -71,7 +71,7 @@ class datasetRanking():
         tstop = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         n_accesses = accesses[tstart]
         d_accesses = max(accesses[tstop] - accesses[tstart], 1)
-        rank = (math.log10(n_accesses)*d_accesses)(size*replicas**2)
+        rank = (math.log10(n_accesses)*d_accesses)/(size*replicas**2)
         return rank
 
     def getRankings(self):
@@ -80,18 +80,21 @@ class datasetRanking():
         query = "SELECT r.DatasetName FROM (SELECT Datasets.DatasetId, Datasets.DatasetName, Replicas.Date, Replicas.Replicas FROM Replicas INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId ORDER BY Replicas.Date DESC) r GROUP BY r.DatasetId"
         data = self.dbaccess.dbQuery(query)
         for dataset in (d[0] for d in data):
+            ddict = dict()
             replicas = self.getReplicas(dataset)
             if not replicas:
                 continue
+            ddict['replicas'] = replicas
             size = self.getSize(dataset)
             if not size:
                 continue
-            # Dummy accesses
+            ddict['size'] = size
             accesses = dict()
             for i in range(1, 6):
                 date = (datetime.date.today() - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
                 accesses[date] = 1
-            rankings[dataset] = {'replicas':replicas, 'size':size, 'accesses':accesses}
+            ddict['accesses'] = accesses
+            rankings[dataset] = ddict
         rankings = self.getAccesses(rankings)
         for dataset in iter(rankings):
             rank = self.getNaiveRank(rankings[dataset]['replicas'], rankings[dataset]['size'], rankings[dataset]['accesses'])
