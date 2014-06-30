@@ -17,10 +17,7 @@
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os, urllib, urllib2, httplib
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import json
 
 class phedex:
     def __init__(self):

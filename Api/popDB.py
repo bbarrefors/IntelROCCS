@@ -16,10 +16,7 @@
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os, re, urllib, urllib2, subprocess
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import json
 
 class popDB():
     def __init__(self):

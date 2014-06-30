@@ -40,18 +40,19 @@ updatereplicasdb.updateReplicas()
 datasetRankings = datasetranking.getDatasetRankings()
 sortedDatasetRankings = []
 for dataset in iter(datasetRankings):
-	datasetRankings[dataset]['rank'] >= threshold:
-		sortedDatasetRankings.append((dataset, datasetRankings[dataset]['rank']))
+	#if datasetRankings[dataset]['rank'] >= threshold:
+	sortedDatasetRankings.append((dataset, datasetRankings[dataset]['rank']))
 sort(sortedDatasetRankings, key=itemgetter(1))
+print sortedDatasetRankings
 
 # Get site rankings
 # {site:{'rank':rank, 'space':space, 'cpu':{'2014-06-18':cpu, '2014-06-17':cpu, '2014-06-16':cpu, '2014-06-15':cpu, '2014-06-14':cpu}}}
 siteRanking = siteranking.getSiteRankings()
 sortedSiteRankings = []
 for site in iter(siteRankings):
-	siteRankings[site]['rank'] >= threshold:
-		sortedSiteRankings.append((site, siteRankings[site]['rank']))
+	sortedSiteRankings.append((site, siteRankings[site]['rank']))
 sort(sortedSiteRankings, key=itemgetter(1))
+print sortedSiteRankings
 
 # Select datasets and sites for subscriptions
 subscriptions = dict()

@@ -1,3 +1,5 @@
 certs/
 db/
 logs/
+*.py[cod]
+*~

@@ -52,8 +52,9 @@ class updateDB():
         def insertSubscription(self, json_data):
             request_id = json_data.get('phedex').get('request_created')[0].get('id')
             # TODO : Definition for subscriptions table?
-            #query = "INSERT INTO "
-            #values = []
+            query = "INSERT INTO "
+            values = []
+            self.dbaccess.dbQuery(query, values=tuple(values))
 
 #===================================================================================================
 #  M A I N
