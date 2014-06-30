@@ -18,7 +18,7 @@ class select():
         upto = 0
         for c, w in choices.iteritems():
             if upto + w > r:
-                return c
+                return c, w
             upto += w
 
 #===================================================================================================

@@ -43,6 +43,7 @@ for dataset in iter(datasetRankings):
 	#if datasetRankings[dataset]['rank'] >= threshold:
 	sortedDatasetRankings.append((dataset, datasetRankings[dataset]['rank']))
 sort(sortedDatasetRankings, key=itemgetter(1))
+sortedDatasetRankings = set(sortedDatasetRankings)
 print sortedDatasetRankings
 
 # Get site rankings
@@ -52,26 +53,28 @@ sortedSiteRankings = []
 for site in iter(siteRankings):
 	sortedSiteRankings.append((site, siteRankings[site]['rank']))
 sort(sortedSiteRankings, key=itemgetter(1))
+sortedSiteRankings = set(sortedSiteRankings)
 print sortedSiteRankings
 
 # Select datasets and sites for subscriptions
 subscriptions = dict()
-while selectedGB < budgetGB:
-	dataset = select.weightedChoice(sortedDatasetRankings)
+while (selectedGB < budgetGB) and (sortedDatasetRankings):
+	dataset, rank = select.weightedChoice(sortedDatasetRankings)
 	site = select.weightedChoice(sortedSiteRankings)
 	if site in subscriptions:
 		subscriptions[site].append(dataset)
 	else:
 		subscriptions[site] = [dataset]
+	sortedDatasetRankings.remove((dataset, rank))
 
 #  reate subscriptions
 for site in iter(subscriptions):
 	data = self.phdx.xmlData(subscriptions[site])
 	# TODO : Improve comments
 	# TODO : Check for errors
-	json_data = self.phdx.subscribe(node=site, data=data, level='file', group='AnalysisOps', request_only='y', comments='IntelROCCS DataDealer')
+	#json_data = self.phdx.subscribe(node=site, data=data, level='file', group='AnalysisOps', request_only='y', comments='IntelROCCS DataDealer')
 	# TODO : Insert subscription into db
-	self.updatedb(json_data)
+	#self.updatedb(json_data)
 
 # Send summary report
 # TODO : Send daliy report
