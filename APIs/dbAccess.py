@@ -51,12 +51,12 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print "Usage: python ./dbAccess.py <'db query'> ['value1', 'value2', ...]"
         sys.exit(2)
-    dbAcc = dbAccess()
+    dbaccess = dbAccess()
     query = sys.argv[1]
     values = []
     for v in sys.argv[2:]:
         values.append(v)
     values = tuple(values)
-    data = dbAcc.dbQuery(query, values=values)
+    data = dbaccess.dbQuery(query, values=values)
     print data
     sys.exit(0)

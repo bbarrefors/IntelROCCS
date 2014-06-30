@@ -13,7 +13,7 @@ for root, dirs, files in os.walk(BASEDIR):
     sys.path.append(root)
 import dbAccess, phedex
 
-class updateReplicasDB():
+class updateDB():
     def __init__(self):
         self.dbaccess = dbAccess.dbAccess()
         self.phdx = phedex.phedex()
@@ -23,19 +23,19 @@ class updateReplicasDB():
 #===================================================================================================
     def getReplicas(self):
         query = "SELECT Datasets.DatasetName, Replicas FROM(SELECT * FROM Replicas ORDER BY Date DESC) r GROUP BY DatasetId INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId"
-        data = self.dbAcc.dbQuery(query)
-        oldReplicas = dict()
+        data = self.dbaccess.dbQuery(query)
+        old_replicas = dict()
         for replicas in data:
-            oldReplicas[replicas[0]] = replicas[1]
-        return oldReplicas
+            old_replicas[replicas[0]] = replicas[1]
+        return old_replicas
 
     def insertReplicas(self, dataset, replicas):
         query = "INSERT INTO Replicas (DatasetId, Replicas) SELECT Datasets.DatasetId, %s FROM Datasets WHERE DatasetName=%s"
         values = [replicas, dataset]
-        self.dbAcc.dbQuery(query, values=tuple(values))
+        self.dbaccess.dbQuery(query, values=tuple(values))
 
     def updateReplicas(self):
-        newReplicas = dict()
+        new_replicas = dict()
         json_data = self.phdx.blockReplicas(self, group='AnalysisOps', show_dataset='y', created_since='0')
         data = json_data.get('phedex').get('dataset')
         for d in data:
@@ -43,11 +43,17 @@ class updateReplicasDB():
             replicas = 0
             for replica in d.get('block')[0].get('replica'):
                 replicas += 1
-            newReplicas[dataset] = replicas
-        oldReplicas = self.getReplicas()
-        for dataset, replicas in newReplicas.iteritems():
-            if (not (dataset in oldReplicas)) or (oldReplicas[dataset] != replicas):
-                self.insertReplicas(dataset, replicas)
+            new_replicas[dataset] = replicas
+        old_replicas = self.getReplicas()
+        for dataset, replicas in new_replicas.iteritems():
+            if (not (dataset in old_replicas)) or (old_replicas[dataset] != replicas):
+                self.insert_replicas(dataset, replicas)
+
+        def insertSubscription(self, json_data):
+            request_id = json_data.get('phedex').get('request_created')[0].get('id')
+            # TODO : Definition for subscriptions table?
+            #query = "INSERT INTO "
+            #values = []
 
 #===================================================================================================
 #  M A I N
@@ -58,8 +64,8 @@ if __name__ == '__main__':
     if not (len(sys.argv) == 4):
         print "Usage: python ./updateDB.py <function> <dataset> <replicas>"
         sys.exit(2)
-    dbUpdate = updateDB()
-    func = getattr(dbUpdate, sys.argv[1], None)
+    updatedb = updateDB()
+    func = getattr(updatedb, sys.argv[1], None)
     if not func:
         print "Function %s is not available" % (sys.argv[1])
         print "Usage: python ./updateDB.py <function> <dataset> <replicas>"

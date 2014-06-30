@@ -23,7 +23,7 @@ class getSites():
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s"
         values = ["analysisOps"]
-        data = self.dbAcc.dbQuery(query, values=tuple(values))
+        data = self.dbaccess.dbQuery(query, values=tuple(values))
         return [site[0] for site in data]
 
     def getBlacklistedSites(self):
@@ -31,7 +31,7 @@ class getSites():
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
         values = ['AnalysisOps', '0']
-        data = self.dbAcc.dbQuery(query, values=tuple(values))
+        data = self.dbaccess.dbQuery(query, values=tuple(values))
         return [site[0] for site in data]
 
     def getAvailableSites(self):
@@ -39,7 +39,7 @@ class getSites():
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
         values = ['AnalysisOps', '1']
-        data = self.dbAcc.dbQuery(query, values=tuple(values))
+        data = self.dbaccess.dbQuery(query, values=tuple(values))
         return [site[0] for site in data]
 
 #===================================================================================================
@@ -51,8 +51,8 @@ if __name__ == '__main__':
     if not (len(sys.argv) == 2):
         print "Usage: python ./getSites.py <function>"
         sys.exit(2)
-    siteReq = getSites()
-    func = getattr(siteReq, sys.argv[1], None)
+    site_req = getSites()
+    func = getattr(site_req, sys.argv[1], None)
     if not func:
         print "Function %s is not available" % (sys.argv[1])
         print "Usage: python ./getSites.py <function>"

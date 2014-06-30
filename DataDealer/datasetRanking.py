@@ -74,12 +74,12 @@ class datasetRanking():
         rank = (math.log10(n_accesses)*d_accesses)/(size*replicas**2)
         return rank
 
-    def getRankings(self):
+    def getDatasetRankings(self):
         # Example: {'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}
         rankings = dict()
         query = "SELECT r.DatasetName FROM (SELECT Datasets.DatasetId, Datasets.DatasetName, Replicas.Date, Replicas.Replicas FROM Replicas INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId ORDER BY Replicas.Date DESC) r GROUP BY r.DatasetId"
-        data = self.dbaccess.dbQuery(query)
-        for dataset in (d[0] for d in data):
+        json_data = self.dbaccess.dbQuery(query)
+        for dataset in (d[0] for d in json_data):
             ddict = dict()
             replicas = self.getReplicas(dataset)
             if not replicas:
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     if not (len(sys.argv) == 1):
         print "Usage: python ./datasetRanking.py"
         sys.exit(2)
-    datasetranking = datasetRanking()
-    data = datasetranking.getRankings()
+    dataset_ranking = datasetRanking()
+    data = dataset_ranking.getRankings()
     print data
     sys.exit(0)

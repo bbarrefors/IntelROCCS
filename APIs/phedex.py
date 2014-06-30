@@ -48,6 +48,41 @@ class phedex:
             raise Exception("FATAL - phedex failure, reason: %s" % (str(strout)))
         return json_data
 
+    def parse(self, data, xml):
+        for k, v in data.iteritems():
+            k = k.replace("_", "-")
+            if type(v) is list:
+                xml = "%s>" % (xml,)
+                for v1 in v:
+                    xml = "%s<%s" % (xml, k)
+                    xml = self.parse(v1, xml)
+                    if (k == "file"):
+                        xml = "%s/>" % (xml,)
+                    else:
+                        xml = "%s</%s>" % (xml, k)
+            else:
+                if k == "lfn":
+                    k = "name"
+                elif k == "size":
+                    k = "bytes"
+                if (k == "name" or k == "is-open" or k == "is-transient" or k == "bytes" or k== "checksum"):
+                    xml = '%s %s="%s"' % (xml, k, v)
+        return xml
+
+    def xmlData(self, datasets=[], instance='prod'):
+        xml = '<data version="2">'
+        xml = '%s<%s name="https://cmsweb.cern.ch/dbs/%s/global/DBSReader">' % (xml, 'dbs', instance)
+        for dataset in datasets:
+            json_data = self.data(dataset=dataset, level='file', create_since='0', instance=instance)
+            data = json_data.get('phedex').get('dbs')
+            xml = "%s<%s" % (xml, 'dataset')
+            data = data[0].get('dataset')
+            xml = self.parse(data[0], xml)
+            xml = "%s</%s>" % (xml, 'dataset')
+        xml = "%s</%s>" % (xml, 'dbs')
+        xml_data = "%s</data>" % (xml,)
+        return xml_data
+
 #===================================================================================================
 #  A P I   C A L L S
 #===================================================================================================
