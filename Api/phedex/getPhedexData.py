@@ -2,7 +2,7 @@
 #---------------------------------------------------------------------------------------------------
 # getPhedexData.py
 #---------------------------------------------------------------------------------------------------
-import sys, os, datetime
+import sys, os, datetime, json
 import phedexApi
 
 class getPhedexData:
@@ -35,11 +35,10 @@ class getPhedexData:
 
     def updateCache(self):
         jsonData = self.phdxApi.blockReplicas(node='T2_US_MIT', subscribed='y', complete='n', show_dataset='y', create_since='0')
-        phdxCache = open(phedexCache, 'w')
-        phdxCache.write(jsonData)
+        with open(self.cachePath+'/'+self.cacheFileName, 'w') as cacheFile:
+            json.dump(jsonData, cacheFile)
         # datasets = jsonData.get('phedex').get('dataset')
         # for dataset in datasets:
-
         #     datasetName = dataset.get('name')
         #     sizeGb = dataset.get('bytes')
         #     files = dataset.get('files')
@@ -50,15 +49,18 @@ class getPhedexData:
         #     for block in blocks:
         #         size += block.get('bytes')
         #         files += block.get('files')
-        phdxCache.close()
 
 #===================================================================================================
 #  M A I N
 #===================================================================================================
     def getPhedexData(self):
-        test = self.shouldAccessPhedex()
-        self.updateCache()
-        # get data
+        if self.shouldAccessPhedex():
+            self.updateCache()
+        cacheFile = open(self.cachePath+'/'+self.cacheFileName, 'r')
+        cache = cacheFile.read()
+        cacheFile.close()
+        jsonData = json.loads(cache)
+        print jsonData
 
 if __name__ == '__main__':
     cachePath = os.environ['INTELROCCS_BASE'] + "/Cache"
