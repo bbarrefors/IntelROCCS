@@ -35,19 +35,22 @@ class getPhedexData:
 
     def updateCache(self):
         jsonData = self.phdxApi.blockReplicas(node='T2_US_MIT', subscribed='y', complete='n', show_dataset='y', create_since='0')
-        datasets = jsonData.get('phedex').get('dataset')
-        for dataset in datasets:
-            datasetName = dataset.get('name')
-            sizeGb = dataset.get('bytes')
-            files = dataset.get('files')
-            custodial = dataset.get
-            groupName = ""
-            created = ""
-            blocks = dataset.get('block')            
-            for block in blocks:
-                size += block.get('bytes')
-                files += block.get('files')
-        #print jsonData
+        phdxCache = open(phedexCache, 'w')
+        phdxCache.write(jsonData)
+        # datasets = jsonData.get('phedex').get('dataset')
+        # for dataset in datasets:
+
+        #     datasetName = dataset.get('name')
+        #     sizeGb = dataset.get('bytes')
+        #     files = dataset.get('files')
+        #     custodial = dataset.get
+        #     groupName = ""
+        #     created = ""
+        #     blocks = dataset.get('block')            
+        #     for block in blocks:
+        #         size += block.get('bytes')
+        #         files += block.get('files')
+        phdxCache.close()
 
 #===================================================================================================
 #  M A I N
