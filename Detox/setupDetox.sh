@@ -13,6 +13,8 @@ export DETOX_SITESTORAGE_DB="SiteStorage"
 export DETOX_SITESTORAGE_USER="cmsSiteDb"
 export DETOX_SITESTORAGE_PW="db78user?Cms"
 
+export DETOX_HISTORY_DB="DetoxHistory"
+
 # sub directories
 
 export DETOX_QUOTAS="Quotas"
@@ -33,6 +35,10 @@ export DETOX_USAGE_MAX=0.9
 export DETOX_USAGE_MIN=0.8
 export DETOX_NCOPY_MIN=1
 
+# What time window (in months) will be used for counting usage
+
+export DETOX_TIME_WIND=10
+
 # Certificate location
 
 export DETOX_X509UP=/tmp/x509up_prod_u5407
@@ -40,6 +46,10 @@ export DETOX_X509UP=/tmp/x509up_prod_u5407
 # Local logging database config file
 
 export DETOX_MYSQL_CONFIG=/etc/myIntelROCCS.cnf
+
+# Email list to notify in case of problems
+
+export DETOX_EMAIL_LIST=t2lab@mit.edu
 
 # Paths
 
@@ -57,6 +67,6 @@ export LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
 
 if [ -z "$PYTHONPATH" ] 
 then
-  export PYTHONPATH="/usr/local/lib/python2.7:/usr/local/lib/python2.7/site-packages"
+  export PYTHONPATH="/usr/lib/python2.6:/usr/lib/python2.6/site-packages"
 fi
 export PYTHONPATH="${DETOX_PYTHONPATH}:$PYTHONPATH"

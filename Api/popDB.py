@@ -22,9 +22,9 @@ class popDB():
     def __init__(self):
         self.BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
         self.POPDB_BASE = "https://cms-popularity.cern.ch/popdb/popularity/"
-        self.CERT = "%s/certs/myCert.pem" % (self.BASEDIR)
-        self.KEY = "%s/certs/myCert.key" % (self.BASEDIR)
-        self.COOKIE = "%s/certs/ssocookie.txt" % (self.BASEDIR)
+        self.CERT = "%s/.globus/userert.pem" % (self.BASEDIR)
+        self.KEY = "%s/.globus/userkey.pem" % (self.BASEDIR)
+        self.COOKIE = "%s/.globus/ssocookie.txt" % (self.BASEDIR)
 
 #===================================================================================================
 #  H E L P E R S

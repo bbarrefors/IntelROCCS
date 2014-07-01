@@ -1,6 +1,5 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
-#
 # Python interface to access PhEDEx online API. See website for API documentation
 # (https://cmsweb.cern.ch/phedex/datasvc/doc)
 #
@@ -14,12 +13,10 @@
 # Instance of phedex can be selected using the instance parameter [prod/dev], default is prod.
 #
 # In case of error an exception is thrown. This needs to be dealt with by the caller.
-#
 #---------------------------------------------------------------------------------------------------
-import sys, os, urllib, urllib2, httplib
-import json
+import sys, os, urllib, urllib2, httplib, json
 
-class phedex:
+class phedexApi:
     def __init__(self):
         self.PHEDEX_BASE = "https://cmsweb.cern.ch/phedex/datasvc/"
 
@@ -30,20 +27,20 @@ class phedex:
         data = urllib.urlencode(values)
         opener = urllib2.build_opener(HTTPSGridAuthHandler())
         request = urllib2.Request(url, data)
-        full_url = request.get_full_url() + request.get_data()
+        fullUrl = request.get_full_url() + request.get_data()
         strout = ""
         try:
             strout = opener.open(request)
         except urllib2.HTTPError, e:
-            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(full_url)))
+            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(fullUrl)))
         except urllib2.URLError, e:
-            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(full_url)))
+            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(fullUrl)))
         try:
             response = strout.read()
-            json_data = json.loads(response)
+            jsonData = json.loads(response)
         except ValueError, e:
-            raise Exception("FATAL - phedex failure, reason: %s" % (str(strout)))
-        return json_data
+            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(strout), str(fullUrl)))
+        return jsonData
 
     def parse(self, data, xml):
         for k, v in data.iteritems():
@@ -70,15 +67,15 @@ class phedex:
         xml = '<data version="2">'
         xml = '%s<%s name="https://cmsweb.cern.ch/dbs/%s/global/DBSReader">' % (xml, 'dbs', instance)
         for dataset in datasets:
-            json_data = self.data(dataset=dataset, level='file', create_since='0', instance=instance)
-            data = json_data.get('phedex').get('dbs')
+            jsonData = self.data(dataset=dataset, level='file', create_since='0', instance=instance)
+            data = jsonData.get('phedex').get('dbs')
             xml = "%s<%s" % (xml, 'dataset')
             data = data[0].get('dataset')
             xml = self.parse(data[0], xml)
             xml = "%s</%s>" % (xml, 'dataset')
         xml = "%s</%s>" % (xml, 'dbs')
-        xml_data = "%s</data>" % (xml,)
-        return xml_data
+        xmlData = "%s</data>" % (xml,)
+        return xmlData
 
 #===================================================================================================
 #  A P I   C A L L S
