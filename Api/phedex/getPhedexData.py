@@ -33,21 +33,33 @@ class getPhedexData:
         # there is no cache file
         return True
 
-    def updateCache():
-        jsonData = self.phdxApi.blockReplicas(node='T2*', subscribed='y', show_dataset='y')
-        print jsonData
+    def updateCache(self):
+        jsonData = self.phdxApi.blockReplicas(node='T2_US_MIT', subscribed='y', complete='n', show_dataset='y', create_since='0')
+        datasets = jsonData.get('phedex').get('dataset')
+        for dataset in datasets:
+            datasetName = dataset.get('name')
+            sizeGb = dataset.get('bytes')
+            files = dataset.get('files')
+            custodial = dataset.get
+            groupName = ""
+            created = ""
+            blocks = dataset.get('block')            
+            for block in blocks:
+                size += block.get('bytes')
+                files += block.get('files')
+        #print jsonData
 
 #===================================================================================================
 #  M A I N
 #===================================================================================================
     def getPhedexData(self):
-        if shouldAccessPhedex():
-            updateCache()
+        test = self.shouldAccessPhedex()
+        self.updateCache()
         # get data
 
 if __name__ == '__main__':
     cachePath = os.environ['INTELROCCS_BASE'] + "/Cache"
     cacheFileName = "phedexCache.dat"
     phedexData = getPhedexData(cachePath, cacheFileName, 12)
-    ret = phedexData.shouldAccessPhedex()
+    phedexData.getPhedexData()
     sys.exit(0)
