@@ -61,7 +61,6 @@ class datasetRanking():
             for d in data:
                 dataset = d.get('COLLNAME')
                 if dataset in rankings:
-                    print "Foobar"
                     rankings[dataset]['accesses'][tstart] = d.get('NACC')
         return rankings
 

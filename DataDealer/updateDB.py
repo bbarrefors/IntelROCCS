@@ -22,7 +22,7 @@ class updateDB():
 #  H E L P E R S
 #===================================================================================================
     def getReplicas(self):
-        query = "SELECT Datasets.DatasetName, Replicas FROM(SELECT * FROM Replicas ORDER BY Date DESC) r GROUP BY DatasetId INNER JOIN Datasets ON Datasets.DatasetId=Replicas.DatasetId"
+        query = "SELECT Datasets.DatasetName, Replicas FROM(SELECT * FROM Replicas ORDER BY Date DESC) r INNER JOIN Datasets ON Datasets.DatasetId=r.DatasetId GROUP BY r.DatasetId"
         data = self.dbaccess.dbQuery(query)
         old_replicas = dict()
         for replicas in data:
@@ -36,7 +36,7 @@ class updateDB():
 
     def updateReplicas(self):
         new_replicas = dict()
-        json_data = self.phdx.blockReplicas(self, group='AnalysisOps', show_dataset='y', created_since='0')
+        json_data = self.phdx.blockReplicas(group='AnalysisOps', show_dataset='y', create_since='0')
         data = json_data.get('phedex').get('dataset')
         for d in data:
             dataset = d.get('name')
@@ -47,14 +47,14 @@ class updateDB():
         old_replicas = self.getReplicas()
         for dataset, replicas in new_replicas.iteritems():
             if (not (dataset in old_replicas)) or (old_replicas[dataset] != replicas):
-                self.insert_replicas(dataset, replicas)
+                self.insertReplicas(dataset, replicas)
 
-        def insertSubscription(self, json_data):
-            request_id = json_data.get('phedex').get('request_created')[0].get('id')
-            # TODO : Definition for subscriptions table?
-            query = "INSERT INTO "
-            values = []
-            self.dbaccess.dbQuery(query, values=tuple(values))
+    def insertSubscription(self, json_data):
+        request_id = json_data.get('phedex').get('request_created')[0].get('id')
+        # TODO : Definition for subscriptions table?
+        query = "INSERT INTO "
+        values = []
+        self.dbaccess.dbQuery(query, values=tuple(values))
 
 #===================================================================================================
 #  M A I N

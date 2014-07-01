@@ -8,7 +8,7 @@
 # At the end a summary is emailed out with what was done during the run.
 #
 #---------------------------------------------------------------------------------------------------
-import sys, os
+import sys, os, subprocess
 BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
 for root, dirs, files in os.walk(BASEDIR):
     sys.path.append(root)
@@ -33,7 +33,7 @@ popdb.renewSSOCookie()
 subprocess.call(["grid-proxy-init", "-valid", "24:00"])
 
 # Update db
-updatereplicasdb.updateReplicas()
+#updatedb.updateReplicas()
 
 # Get dataset rankings
 # {dataset:{'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}, ...}
@@ -42,8 +42,7 @@ sortedDatasetRankings = []
 for dataset in iter(datasetRankings):
 	#if datasetRankings[dataset]['rank'] >= threshold:
 	sortedDatasetRankings.append((dataset, datasetRankings[dataset]['rank']))
-sort(sortedDatasetRankings, key=itemgetter(1))
-sortedDatasetRankings = set(sortedDatasetRankings)
+sortedDatasetRankings = set(sorted(sortedDatasetRankings, key=itemgetter(1)))
 print sortedDatasetRankings
 
 # Get site rankings
@@ -52,8 +51,7 @@ siteRanking = siteranking.getSiteRankings()
 sortedSiteRankings = []
 for site in iter(siteRankings):
 	sortedSiteRankings.append((site, siteRankings[site]['rank']))
-sort(sortedSiteRankings, key=itemgetter(1))
-sortedSiteRankings = set(sortedSiteRankings)
+sortedSiteRankings = set(sorted(sortedSiteRankings, key=itemgetter(1)))
 print sortedSiteRankings
 
 # Select datasets and sites for subscriptions
@@ -66,8 +64,9 @@ while (selectedGB < budgetGB) and (sortedDatasetRankings):
 	else:
 		subscriptions[site] = [dataset]
 	sortedDatasetRankings.remove((dataset, rank))
+print subscriptions
 
-#  reate subscriptions
+# create subscriptions
 for site in iter(subscriptions):
 	data = self.phdx.xmlData(subscriptions[site])
 	# TODO : Improve comments
