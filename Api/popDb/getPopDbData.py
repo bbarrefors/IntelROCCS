@@ -46,13 +46,10 @@ class getPopDbData:
         if self.shouldAccessPopDb(apiCall, date):
             # TODO : deal with if this fails
             self.popDbApi.renewSSOCookie()
-            jsonData = self.updateCache(date)
-            return jsonData
-        cacheFile = open("%s/%s/%s" % (self.cachePath, apiCall, tstart), 'r')
-        cache = cacheFile.read()
-        cacheFile.close()
-        jsonData = json.loads(cache)
-        return jsonData
+            return self.updateCache(apiCall, date)
+        # access cache
+        with open("%s/%s/%s" % (self.cachePath, apiCall, date), 'r') as cacheFile:
+            return json.loads(cacheFile.read())
 
 if __name__ == '__main__':
     cachePath = "%s/Cache/PopDbCache" % (os.environ['INTELROCCS_BASE'])

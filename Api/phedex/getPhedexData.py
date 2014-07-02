@@ -53,15 +53,11 @@ class getPhedexData:
     def getPhedexData(self, apiCall):
         if self.shouldAccessPhedex(apiCall):
             subprocess.call(["grid-proxy-init", "-valid", "24:00"])
-            jsonData = self.updateCache(apiCall)
-            return jsonData
+            return self.updateCache(apiCall)
         # access cache
-        cacheFile = open("%s/%s" % (self.cachePath, apiCall), 'r')
-        cache = cacheFile.read()
-        cacheFile.close()
-        # TODO : what if file is incorrect or corrupt? email someone
-        jsonData = json.loads(cache)
-        return jsonData
+        with open("%s/%s" % (self.cachePath, apiCall), 'r') as cacheFile:
+            # TODO : what if file is incorrect or corrupt? email someone
+            return json.loads(cacheFile.read())
 
 if __name__ == '__main__':
     cachePath = "%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE'])
