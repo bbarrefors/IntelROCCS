@@ -60,7 +60,7 @@ class getPhedexData:
         cacheFile.close()
         # TODO : what if file is incorrect or corrupt? email someone
         jsonData = json.loads(cache)
-        print jsonData
+        return jsonData
 
 if __name__ == '__main__':
     cachePath = "%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE'])
