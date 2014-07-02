@@ -7,7 +7,7 @@ import phedexApi
 
 class getPhedexData:
     def __init__(self, cachePath, cacheFileName, oldestAllowedHours):
-        self.phdxApi = phedexApi.phedexApi()
+        self.phedexApi = phedexApi.phedexApi()
         self.cachePath = cachePath
         self.cacheFileName = cacheFileName
         self.oldestAllowedHours = oldestAllowedHours
@@ -34,7 +34,7 @@ class getPhedexData:
         return True
 
     def updateCache(self):
-        jsonData = self.phdxApi.blockReplicas(node='T2_US_MIT', subscribed='y', complete='n', show_dataset='y', create_since='0')
+        jsonData = self.phedexApi.blockReplicas(node='T2_US_MIT', subscribed='y', complete='n', show_dataset='y', create_since='0')
         with open(self.cachePath+'/'+self.cacheFileName, 'w') as cacheFile:
             json.dump(jsonData, cacheFile)
         # datasets = jsonData.get('phedex').get('dataset')
