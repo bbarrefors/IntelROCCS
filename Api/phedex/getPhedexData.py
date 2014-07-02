@@ -63,7 +63,7 @@ class getPhedexData:
         print jsonData
 
 if __name__ == '__main__':
-    cachePath = os.environ['INTELROCCS_BASE'] + "/Cache"
+    cachePath = "%s/Cache" % (os.environ['INTELROCCS_BASE'])
     cacheFileName = "phedexCache.dat"
     phedexData = getPhedexData(cachePath, cacheFileName, 12)
     phedexData.getPhedexData()

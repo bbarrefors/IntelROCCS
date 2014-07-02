@@ -18,13 +18,13 @@
 import sys, os, re, urllib, urllib2, subprocess
 import json
 
-class popDB():
+class popDbApi():
     def __init__(self):
         self.BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
         self.POPDB_BASE = "https://cms-popularity.cern.ch/popdb/popularity/"
-        self.CERT = "%s/.globus/userert.pem" % (self.BASEDIR)
-        self.KEY = "%s/.globus/userkey.pem" % (self.BASEDIR)
-        self.COOKIE = "%s/.globus/ssocookie.txt" % (self.BASEDIR)
+        self.CERT = "%s/.globus/usercert.pem" % (os.environ['HOME'])
+        self.KEY = "%s/.globus/userkey.pem" % (os.environ['HOME'])
+        self.COOKIE = "%s/.globus/ssocookie.txt" % (os.environ['HOME'])
 
 #===================================================================================================
 #  H E L P E R S
@@ -33,6 +33,7 @@ class popDB():
         subprocess.call(["cern-get-sso-cookie", "--cert", self.CERT, "--key", self.KEY, "-u", self.POPDB_BASE, "-o", self.COOKIE])
 
     def call(self, url, values):
+        self.renewSSOCookie()
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
         full_url = request.get_full_url() + request.get_data()

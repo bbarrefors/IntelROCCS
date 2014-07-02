@@ -2,14 +2,13 @@
 #---------------------------------------------------------------------------------------------------
 # getPhedexData.py
 #---------------------------------------------------------------------------------------------------
-import sys, os, datetime, json
-import phedexApi
+import sys, os, json, datetime
+import popDbApi
 
-class getPopData:
+class getPopDbData:
     def __init__(self, cachePath, oldestAllowedHours):
         self.popDbApi = popDbApi.popDbApi()
         self.cachePath = cachePath
-        self.cacheFileName = cacheFileName
         self.oldestAllowedHours = oldestAllowedHours
 
 #===================================================================================================
@@ -48,8 +47,9 @@ class getPopData:
         return jsonData
 
 if __name__ == '__main__':
-    cachePath = os.environ['INTELROCCS_BASE'] + "/Cache/popDbCache"
-    popDbData = getPopData(cachePath, 12)
-    jsonData = popDbData.getPopData()
+    cachePath = "%s/Cache/popDbCache" % (os.environ['INTELROCCS_BASE'])
+    date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    popDbData = getPopDbData(cachePath, 12)
+    jsonData = popDbData.getPopDbData(date)
     print jsonData
     sys.exit(0)
