@@ -41,7 +41,7 @@ class getPhedexData:
         if apiCall == "blockReplicas":
             jsonData = self.phedexApi.blockReplicas(node='T2*', subscribed='y', show_dataset='y', create_since='0')
         if not os.path.exists(self.cachePath):
-            os.makedirs("%s/%s" % (self.cachePath, apiCall)
+            os.makedirs(self.cachePath)
         with open("%s/%s" % (self.cachePath, apiCall), 'w') as cacheFile:
             json.dump(jsonData, cacheFile)
         return jsonData
@@ -60,7 +60,7 @@ class getPhedexData:
         cacheFile.close()
         # TODO : what if file is incorrect or corrupt? email someone
         jsonData = json.loads(cache)
-        print jsonData
+        return jsonData
 
 if __name__ == '__main__':
     cachePath = "%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE'])
