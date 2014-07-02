@@ -1,6 +1,5 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
-#
 # Python interface to access Popularity Database. See website for API documentation
 # (https://cms-popularity.cern.ch/popdb/popularity/apidoc)
 #
@@ -13,7 +12,6 @@
 # passed. All such checks needs to be done by the caller.
 #
 # In case of error an exception is thrown. This needs to be dealt with by the caller.
-#
 #---------------------------------------------------------------------------------------------------
 import sys, os, re, urllib, urllib2, subprocess
 import json
@@ -30,10 +28,10 @@ class popDbApi():
 #  H E L P E R S
 #===================================================================================================
     def renewSSOCookie(self):
+        # TODO : what happens if this fails? deal with it
         subprocess.call(["cern-get-sso-cookie", "--cert", self.CERT, "--key", self.KEY, "-u", self.POPDB_BASE, "-o", self.COOKIE])
 
     def call(self, url, values):
-        self.renewSSOCookie()
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
         full_url = request.get_full_url() + request.get_data()

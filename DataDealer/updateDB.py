@@ -13,7 +13,7 @@ for root, dirs, files in os.walk(BASEDIR):
     sys.path.append(root)
 import dbAccess, phedex
 
-class updateDB():
+class updateDb():
     def __init__(self):
         self.dbaccess = dbAccess.dbAccess()
         self.phdx = phedex.phedex()

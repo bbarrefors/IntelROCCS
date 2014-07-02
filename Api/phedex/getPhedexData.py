@@ -34,29 +34,21 @@ class getPhedexData:
         return True
 
     def updateCache(self):
-        jsonData = self.phedexApi.blockReplicas(node='T2_US_MIT', subscribed='y', complete='n', show_dataset='y', create_since='0')
-        with open(self.cachePath+'/'+self.cacheFileName, 'w') as cacheFile:
+        jsonData = self.phedexApi.blockReplicas(node='T2*', subscribed='y', show_dataset='y', create_since='0')
+        with open("%s/%s" % (self.cachePath, self.cacheFileName), 'w') as cacheFile:
             json.dump(jsonData, cacheFile)
-        # datasets = jsonData.get('phedex').get('dataset')
-        # for dataset in datasets:
-        #     datasetName = dataset.get('name')
-        #     sizeGb = dataset.get('bytes')
-        #     files = dataset.get('files')
-        #     custodial = dataset.get
-        #     groupName = ""
-        #     created = ""
-        #     blocks = dataset.get('block')            
-        #     for block in blocks:
-        #         size += block.get('bytes')
-        #         files += block.get('files')
+        return jsonData
 
 #===================================================================================================
 #  M A I N
 #===================================================================================================
     def getPhedexData(self):
         if self.shouldAccessPhedex():
-            self.updateCache()
-        cacheFile = open(self.cachePath+'/'+self.cacheFileName, 'r')
+            subprocess.call(["grid-proxy-init", "-valid", "24:00"])
+            jsonData = self.updateCache()
+            return jsonData
+        # TODO : what if file is incorrect or corrupt? email someone
+        cacheFile = open("%s/%s" % (self.cachePath, self.cacheFileName), 'r')
         cache = cacheFile.read()
         cacheFile.close()
         jsonData = json.loads(cache)

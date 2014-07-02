@@ -28,8 +28,9 @@ class getPopDbData:
     def updateCache(self, date):
         tstart = date
         tstop = tstart
+        # TODO : deal with any exceptions from popDb
         jsonData = self.popDbApi.DSStatInTimeWindow(tstart=tstop, tstop=tstop)
-        with open(self.cachePath+"/"+tstart, 'w') as cacheFile:
+        with open("%s/%s" % (self.cachePath, tstart), 'w') as cacheFile:
             json.dump(jsonData, cacheFile)
         return jsonData
 
@@ -38,9 +39,11 @@ class getPopDbData:
 #===================================================================================================
     def getPopDbData(self, date):
         if self.shouldAccessPopDb(date):
+            # TODO : deal with if this fails
+            self.popDbApi.renewSSOCookie()
             jsonData = self.updateCache(date)
             return jsonData
-        cacheFile = open(self.cachePath+"/"+date, 'r')
+        cacheFile = open("%s/%s" % (self.cachePath, tstart), 'r')
         cache = cacheFile.read()
         cacheFile.close()
         jsonData = json.loads(cache)

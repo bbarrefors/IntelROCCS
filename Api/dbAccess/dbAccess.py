@@ -1,28 +1,24 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
-#
 # Access to MIT database. IP address of machine where script is on need to have permission to access
-# the database. Requires a login file with base64 encoded values for host, database, username, and 
-# password stored in BASEDIR/db/
+# the database.
 #
 # Returns a list with touples of the data requested. Example of what should be passed:
 # query="SELECT * WHERE DatasetName=%s", values=touple("Dataset1")
 # Values are optional
 #
 # In case of error an exception is thrown. This needs to be dealt with by the caller.
-#
 #---------------------------------------------------------------------------------------------------
-import sys, os, base64, MySQLdb
+import sys, os, MySQLdb
 
 class dbAccess():
     def __init__(self):
-        self.BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-        db_file = open('%s/db/login' % (self.BASEDIR))
-        self.HOST = base64.b64decode(db_file.readline().strip())
-        self.DB = base64.b64decode(db_file.readline().strip())
-        self.USER = base64.b64decode(db_file.readline().strip())
-        self.PASSWD = base64.b64decode(db_file.readline().strip())
-        self.DB_CON = MySQLdb.connect(host=self.HOST, user=self.USER, passwd=self.PASSWD, db=self.DB)
+        host = "t3btch039.mit.edu"
+        #db = "IntelROCCS"
+        db = "SiteStorage" # ^^Will switch database^^
+        user = "cmsSiteDb"
+        passwd = "db78user?Cms"
+        self.DB_CON = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 
 #===================================================================================================
 #  H E L P E R S
