@@ -5,10 +5,11 @@
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os, datetime
-BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-for root, dirs, files in os.walk(BASEDIR):
-    sys.path.append(root)
-import phedex, dbAccess, popDB, getSites
+sys.path.append(os.path.dirname(os.environ['INTELROCCS_BASE']))
+import IntelROCCS.Api.popDb.getPopDbData as popDbData
+import IntelROCCS.Api.phedex.getPhedexData as phedexData
+import IntelROCCS.Api.dbAccess.dbAccess as accessDb
+import getSites
 
 class siteRanking():
     def __init__(self):

@@ -32,16 +32,20 @@ class phedexApi:
         try:
             strout = opener.open(request)
         except urllib2.HTTPError, e:
-            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(fullUrl)))
+            raise Exception("FATAL - phedex failure: %s\n- for url: %s" % (str(e), str(fullUrl)))
         except urllib2.URLError, e:
-            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(e), str(fullUrl)))
+            raise Exception("FATAL - phedex failure: %s\n - for url: %s" % (str(e), str(fullUrl)))
         try:
             response = strout.read()
             jsonData = json.loads(response)
         except ValueError, e:
-            raise Exception("FATAL - phedex failure: %s - for url: %s" % (str(strout), str(fullUrl)))
+            raise Exception("FATAL - phedex failure: %s\n - for url: %s" % (str(strout), str(fullUrl)))
         return jsonData
 
+    # the parser (parse and xmlData) is used to create an xml data structure which can be passed to 
+    # phedex calls subscribe and delete. currently it's based on source diving investigation of how
+    # phedex structures this data object, no documentation exists.
+    # TODO : Write example structure for better understanding
     def parse(self, data, xml):
         for k, v in data.iteritems():
             k = k.replace("_", "-")

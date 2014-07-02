@@ -21,34 +21,6 @@ class updateDb():
 #===================================================================================================
 #  H E L P E R S
 #===================================================================================================
-    def getReplicas(self):
-        query = "SELECT Datasets.DatasetName, Replicas FROM(SELECT * FROM Replicas ORDER BY Date DESC) r INNER JOIN Datasets ON Datasets.DatasetId=r.DatasetId GROUP BY r.DatasetId"
-        data = self.dbaccess.dbQuery(query)
-        old_replicas = dict()
-        for replicas in data:
-            old_replicas[replicas[0]] = replicas[1]
-        return old_replicas
-
-    def insertReplicas(self, dataset, replicas):
-        query = "INSERT INTO Replicas (DatasetId, Replicas) SELECT Datasets.DatasetId, %s FROM Datasets WHERE DatasetName=%s"
-        values = [replicas, dataset]
-        self.dbaccess.dbQuery(query, values=tuple(values))
-
-    def updateReplicas(self):
-        new_replicas = dict()
-        json_data = self.phdx.blockReplicas(group='AnalysisOps', show_dataset='y', create_since='0')
-        data = json_data.get('phedex').get('dataset')
-        for d in data:
-            dataset = d.get('name')
-            replicas = 0
-            for replica in d.get('block')[0].get('replica'):
-                replicas += 1
-            new_replicas[dataset] = replicas
-        old_replicas = self.getReplicas()
-        for dataset, replicas in new_replicas.iteritems():
-            if (not (dataset in old_replicas)) or (old_replicas[dataset] != replicas):
-                self.insertReplicas(dataset, replicas)
-
     def insertSubscription(self, json_data):
         request_id = json_data.get('phedex').get('request_created')[0].get('id')
         # TODO : Definition for subscriptions table?

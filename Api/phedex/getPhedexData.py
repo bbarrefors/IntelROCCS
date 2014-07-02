@@ -1,22 +1,24 @@
 #!/usr/local/bin/python
 #---------------------------------------------------------------------------------------------------
-# getPhedexData.py
+# Middleware to access phedex data. To reduce access time we cache the data, this class checks if 
+# the cache exists and is up to date. If it does then fetch it and return. If cache does not exist
+# then access access phedex directly and get the data. First update the cache and then return the
+# data. 
 #---------------------------------------------------------------------------------------------------
 import sys, os, json, datetime, subprocess
 import phedexApi
 
 class getPhedexData:
-    def __init__(self, cachePath, cacheFileName, oldestAllowedHours):
+    def __init__(self, cachePath, oldestAllowedHours):
         self.phedexApi = phedexApi.phedexApi()
         self.cachePath = cachePath
-        self.cacheFileName = cacheFileName
         self.oldestAllowedHours = oldestAllowedHours
 
 #===================================================================================================
 #  H E L P E R S
 #===================================================================================================
-    def shouldAccessPhedex(self):
-        cache = self.cachePath+'/'+self.cacheFileName
+    def shouldAccessPhedex(self, apiCall):
+        cache = "%s/%s" % (self.cachePath, apiCall)
         timeNow = datetime.datetime.now()
         deltaNhours = datetime.timedelta(seconds = 60*60*(self.oldestAllowedHours))
         modTime = datetime.datetime.fromtimestamp(0)
@@ -33,30 +35,35 @@ class getPhedexData:
         # there is no cache file
         return True
 
-    def updateCache(self):
-        jsonData = self.phedexApi.blockReplicas(node='T2*', subscribed='y', show_dataset='y', create_since='0')
-        with open("%s/%s" % (self.cachePath, self.cacheFileName), 'w') as cacheFile:
+    def updateCache(self, apiCall):
+        jsonData = ""
+        # can easily extend this to support more api calls
+        if apiCall == "blockReplicas":
+            jsonData = self.phedexApi.blockReplicas(node='T2*', subscribed='y', show_dataset='y', create_since='0')
+        if not os.path.exists(self.cachePath):
+            os.makedirs("%s/%s" % (self.cachePath, apiCall)
+        with open("%s/%s" % (self.cachePath, apiCall), 'w') as cacheFile:
             json.dump(jsonData, cacheFile)
         return jsonData
 
 #===================================================================================================
 #  M A I N
 #===================================================================================================
-    def getPhedexData(self):
-        if self.shouldAccessPhedex():
+    def getPhedexData(self, apiCall):
+        if self.shouldAccessPhedex(apiCall):
             subprocess.call(["grid-proxy-init", "-valid", "24:00"])
-            jsonData = self.updateCache()
+            jsonData = self.updateCache(apiCall)
             return jsonData
-        # TODO : what if file is incorrect or corrupt? email someone
-        cacheFile = open("%s/%s" % (self.cachePath, self.cacheFileName), 'r')
+        # access cache
+        cacheFile = open("%s/%s" % (self.cachePath, apiCall), 'r')
         cache = cacheFile.read()
         cacheFile.close()
+        # TODO : what if file is incorrect or corrupt? email someone
         jsonData = json.loads(cache)
         print jsonData
 
 if __name__ == '__main__':
-    cachePath = "%s/Cache" % (os.environ['INTELROCCS_BASE'])
-    cacheFileName = "phedexCache.dat"
-    phedexData = getPhedexData(cachePath, cacheFileName, 12)
-    phedexData.getPhedexData()
+    cachePath = "%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE'])
+    phedexData = getPhedexData(cachePath, 12)
+    phedexData.getPhedexData("blockReplicas")
     sys.exit(0)
