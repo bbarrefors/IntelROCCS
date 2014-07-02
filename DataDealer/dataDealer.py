@@ -14,7 +14,7 @@ import IntelROCCS.Api.phedex.getPhedexData as phedexData
 
 # Setup parameters
 # We would like to make these easier to change in the future
-#popDb = popDbData.getPopDbData("%s/Cache/popDbCache" % (os.environ['INTELROCCS_BASE']), 12)
+popDb = popDbData.getPopDbData("%s/Cache/PopDbCache" % (os.environ['INTELROCCS_BASE']), 12)
 phedex = phedexData.getPhedexData("%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE']), 12)
 # updateDb = updateDb.updateDb()
 # datasetRanking = datasetRanking.datasetRanking()
@@ -27,7 +27,7 @@ budgetGb = 10000 # TODO : Decide on a budget
 #  M A I N
 #===================================================================================================
 date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-#popDbJsonData = popDb.getPopDbData(date)
+popDbJsonData = popDb.getPopDbData("DSStatInTimeWindow", date)
 phedexJsonData = phedex.getPhedexData("blockReplicas")
 
 # Get dataset rankings
