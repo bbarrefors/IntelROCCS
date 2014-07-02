@@ -1,5 +1,4 @@
-certs/
+Cache/phedexCache.dat
 db/
-logs/
 *.py[cod]
 *~
