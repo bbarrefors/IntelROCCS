@@ -31,6 +31,7 @@ class getPopDbData:
         # TODO : deal with any exceptions from popDb
         jsonData = self.popDbApi.DSStatInTimeWindow(tstart=tstop, tstop=tstop)
         with open("%s/%s" % (self.cachePath, tstart), 'w') as cacheFile:
+            # TODO : deal with if folder structure doesn't exist
             json.dump(jsonData, cacheFile)
         return jsonData
 

@@ -2,7 +2,7 @@
 #---------------------------------------------------------------------------------------------------
 # getPhedexData.py
 #---------------------------------------------------------------------------------------------------
-import sys, os, datetime, json
+import sys, os, json, datetime, subprocess
 import phedexApi
 
 class getPhedexData:
