@@ -21,13 +21,16 @@ phedex = phedexData.getPhedexData("%s/Cache" % (os.environ['INTELROCCS_BASE']), 
 # siteRanking = siteRanking.siteRanking()
 # select = select.select()
 
-threshold = 100 # TODO : Find threshold
-budgetGb = 10000 # TODO : Decide on a budget
+# threshold = 100 # TODO : Find threshold
+# budgetGb = 10000 # TODO : Decide on a budget
 #===================================================================================================
 #  M A I N
 #===================================================================================================
 # Update db
 #updateDb.updateReplicas()
+date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+popDb.getPopDbData(date)
+phedex.getPhedexData()
 
 # Get dataset rankings
 # {dataset:{'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}, ...}
