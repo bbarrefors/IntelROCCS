@@ -41,7 +41,7 @@ class getPhedexData:
         if apiCall == "blockReplicas":
             jsonData = self.phedexApi.blockReplicas(node='T2*', subscribed='y', show_dataset='y', create_since='0')
         if not os.path.exists(self.cachePath):
-            os.makedirs("%s/%s" % (self.cachePath, apiCall)
+            os.makedirs("%s/%s" % (self.cachePath, apiCall))
         with open("%s/%s" % (self.cachePath, apiCall), 'w') as cacheFile:
             json.dump(jsonData, cacheFile)
         return jsonData
