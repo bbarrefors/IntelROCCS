@@ -11,7 +11,7 @@
 #---------------------------------------------------------------------------------------------------
 import sys, os, MySQLdb
 
-class dbAccess():
+class dbApi():
     def __init__(self):
         host = "t3btch039.mit.edu"
         #db = "IntelROCCS"
