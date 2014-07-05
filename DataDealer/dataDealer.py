@@ -8,7 +8,7 @@
 #---------------------------------------------------------------------------------------------------
 import sys, os, subprocess, datetime
 sys.path.append(os.path.dirname(os.environ['INTELROCCS_BASE']))
-import datasetRanker
+import datasetRanker, siteRanker
 
 # Setup parameters
 # We would like to make these easier to change in the future
@@ -18,24 +18,12 @@ budgetGb = 10000 # TODO : Decide on a budget
 #  M A I N
 #===================================================================================================
 # Get dataset rankings
-# {dataset:{'rank':rank, 'replicas':replicas, 'size':size, 'accesses':{'2014-06-18':accesses, '2014-06-17':accesses, '2014-06-16':accesses, '2014-06-15':accesses, '2014-06-14':accesses}}, ...}
 datasetRanker = datasetRanker.datasetRanker()
-datasetRankings = datasetRanker.getDatasetRankings()
-# sortedDatasetRankings = []
-# for dataset in iter(datasetRankings):
-# 	#if datasetRankings[dataset]['rank'] >= threshold:
-# 	sortedDatasetRankings.append((dataset, datasetRankings[dataset]['rank']))
-# sortedDatasetRankings = set(sorted(sortedDatasetRankings, key=itemgetter(1)))
-# print sortedDatasetRankings
+datasetRankings = datasetRanker.getDatasetRankings(threshold)
 
 # Get site rankings
-# {site:{'rank':rank, 'space':space, 'cpu':{'2014-06-18':cpu, '2014-06-17':cpu, '2014-06-16':cpu, '2014-06-15':cpu, '2014-06-14':cpu}}}
-# siteRanking = siteranking.getSiteRankings()
-# sortedSiteRankings = []
-# for site in iter(siteRankings):
-# 	sortedSiteRankings.append((site, siteRankings[site]['rank']))
-# sortedSiteRankings = set(sorted(sortedSiteRankings, key=itemgetter(1)))
-# print sortedSiteRankings
+siteRanker = siteRanker.siteRanker()
+siteRankings = siteRanker.getSiteRankings()
 
 # Select datasets and sites for subscriptions
 # subscriptions = dict()

@@ -6,45 +6,45 @@
 #---------------------------------------------------------------------------------------------------
 import sys, os, datetime
 sys.path.append(os.path.dirname(os.environ['INTELROCCS_BASE']))
-import IntelROCCS.Api.popDb.getPopDbData as popDbData
-import IntelROCCS.Api.phedex.getPhedexData as phedexData
-import IntelROCCS.Api.dbAccess.dbAccess as accessDb
 import getSites
 
 class siteRanking():
     def __init__(self):
-        self.dbaccess = dbAccess.dbAccess()
-        self.phdx = phedex.phedex()
-        self.popdb = popDB.popDB()
-        self.getsites = getSites.getSites()
+        self.dbApi = dbApi.dbApi()
+        # get sites
+        getSites = getSites.getSites()
+        availableSites = getSites.getAvailableSites()
+        # get max values
+        maxSiteCpu = getMaxSiteCpu() # Only do one site at a time?
+        maxSiteStorageGb = getMaxSiteStorageGb()
+        # get one day ago values
+        # build site info
+        self.siteInfo = self.buildSiteInfo(availableSites, oneDayAgoCpu, oneDayAgoStorageGb maxSiteCpu, maxSiteStorageGb)
 
 #===================================================================================================
 #  H E L P E R S
 #===================================================================================================
-    def getQuota(self, site):
-        query = "SELECT SizeTb FROM Quotas WHERE SiteName=%s"
-        values = [site]
-        data = self.dbaccess.dbQuery(query, values=tuple(values))
-        return data[0][0]
+    def buildSiteInfo(self, availableSites, oneDayAgoCpu, oneDayAgoStorageGb, maxSiteCpu, maxSiteStorageGb):
+        siteInfo = dict()
+        for site in availableSites:
+            availableSiteStorageGb = maxSiteStorageGb - oneDayAgoStorageGb
+            availableSiteCpu = getMaxSiteCpu - oneDayAgoCpu
+            info = {'availableSiteStorageGb':availableSiteStorageGb , 'availableSiteCpu':availableSiteCpu}
+            siteInfo[site] = info
+        return siteInfo
 
-    def getSpace(self, site):
-        # space = 0.95*total_space - used_space
-        try:
-            json_data = self.phdx.blockReplicas(node=site, group='AnalysisOps', create_since='0')
-        except Exception, e:
-            return None
-        data = json_data.get('phedex').get('block')
-        if not data:
-            return None
-        used_space = float(0)
-        for block in data:
-            replica = block.get('replica')[0]
-            if replica.get('subscribed') == 'y':
-                used_space += block.get('bytes')
-            else:
-                used_space += replica.get('bytes')
-        used_space = int(used_space/10**9)
-        quota = int(self.getQuota(site)*10**3)
+    def getMaxSiteStorageGb(self):
+        query = "SELECT SiteName, SizeTb FROM Quotas WHERE GroupName=%s" # Name of site field column?
+        values = ['AnalysisOps']
+        data = self.dbApi.dbQuery(query, values=values)
+        maxSiteStorage = dict()
+        for site in data:
+            maxSiteStorage[site[0]] = site[1]
+        return maxSiteStorageGb
+
+    def oneDayAgoStorageGb(self, phedexJsonData):
+        # use phedex cache
+        oneDayAgoStorageGb = int(used_space/10**9)
         space = quota - used_space
         return space
 
@@ -69,27 +69,15 @@ class siteRanking():
             cpus[tstart] = cpu
         return cpus
 
-    def getNaiveRank(self, space, cpus):
-        # rank = space * cpu
-        tstart = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        cpu = cpus[tstart]
-        rank = space*cpu
-        return rank
-
     def getSiteRankings(self):
-        # Example : {site:{'rank':rank, 'space':space, 'cpu':{'2014-06-18':cpu, '2014-06-17':cpu, '2014-06-16':cpu, '2014-06-15':cpu, '2014-06-14':cpu}}}
-        rankings = dict()
-        availableSites = self.getsites.getAvailableSites()
-        for site in availableSites:
-            space = self.getSpace(site)
-            if not space:
-                continue
-            cpu = self.getCPU(site)
-            if not cpu:
-                continue
-            rank = self.getNaiveRank(space, cpu)
-            rankings[site] = {'rank':rank, 'space':space, 'cpu':cpu}
-        return rankings
+        # rank = availableSiteStorageGb * availableSiteCpu
+        siteRankings = dict()
+        for siteName, info in self.siteInfo.iteritems():
+            availableSiteCpu = info['availableSiteCpu']
+            availableSiteStorageGb = info['availableSiteStorageGb']
+            rank = (availableSiteCpu*availableSiteStorageGb)
+            siteRankings[SiteName] = rank
+        return siteRankings
 
 #===================================================================================================
 #  M A I N

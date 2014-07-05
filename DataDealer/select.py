@@ -32,7 +32,7 @@ if __name__ == '__main__':
         sys.exit(2)
     select = select()
     # Testcase
-    choices = [('dataset1', 1), ('dataset2', 2), ('dataset2', 2)]
-    data = select.weightedChoice(choices)
-    print data
+    choices = {'dataset1': 1, 'dataset2': 2, 'dataset3': 3}
+    datasetName, ranking = select.weightedChoice(choices)
+    print datasetName + " : " + str(ranking)
     sys.exit(0)

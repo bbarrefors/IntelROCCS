@@ -12,7 +12,6 @@ import IntelROCCS.Api.popDb.getPopDbData as popDbData
 
 class datasetRanker():
     def __init__(self):
-        self.dbApi = dbApi.dbApi()
         phedex = phedexData.getPhedexData("%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE']), 12)
         popDb = popDbData.getPopDbData("%s/Cache/PopDbCache" % (os.environ['INTELROCCS_BASE']), 12)
         phedexJsonData = phedex.getPhedexData('blockReplicas')
@@ -58,16 +57,17 @@ class datasetRanker():
 #===================================================================================================
 #  M A I N
 #===================================================================================================
-    def getDatasetRankings(self):
+    def getDatasetRankings(self, threshold):
         # rank = (log(n_accesses)*d_accesses)/(size*relpicas^2)
         datasetRankings = dict()
-        for datasetName, info in self.datasetInfo.itemgetter():
+        for datasetName, info in self.datasetInfo.iteritems():
             replicas = info['replicas']
             sizeGb = info['sizeGb']
             nAccesses = info['nAccesses']
             dAccesses = max(info['dAccesses'], 1)
             rank = (math.log10(nAccesses)*dAccesses)/(sizeGb*replicas**2)
-            rankings[datasetName] = rank
+            if rank >= threshold:
+                datasetRankings[datasetName] = rank
         return datasetRankings
         
 # Use this for testing purposes or as a script. 

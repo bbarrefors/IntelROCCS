@@ -6,24 +6,19 @@
 #
 #---------------------------------------------------------------------------------------------------
 import sys, os
-BASEDIR = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-for root, dirs, files in os.walk(BASEDIR):
-    sys.path.append(root)
-import dbAccess
+sys.path.append(os.path.dirname(os.environ['INTELROCCS_BASE']))
+import IntelROCCS.Api.db.dbApi as dbApi
 
 class getSites():
     def __init__(self):
-        self.dbaccess = dbAccess.dbAccess()
+        self.dbApi = dbApi.dbApi()
 
-#===================================================================================================
-#  H E L P E R S
-#===================================================================================================
     def getAllSites(self):
         # Change query when tables are updated
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s"
         values = ["analysisOps"]
-        data = self.dbaccess.dbQuery(query, values=tuple(values))
+        data = self.dbaccess.dbQuery(query, values=values)
         return [site[0] for site in data]
 
     def getBlacklistedSites(self):
@@ -31,7 +26,7 @@ class getSites():
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
         values = ['AnalysisOps', '0']
-        data = self.dbaccess.dbQuery(query, values=tuple(values))
+        data = self.dbaccess.dbQuery(query, values=values)
         return [site[0] for site in data]
 
     def getAvailableSites(self):
@@ -39,7 +34,7 @@ class getSites():
         #query = "SELECT Sites.SiteName FROM Sites INNER JOIN Quotas ON Sites.SiteId=Quotas.SiteId INNER JOIN Groups ON Quotas.GroupId=Groups.GroupId WHERE Groups.GroupName=%s AND Quotas.Status=%s"
         query = "SELECT SiteName FROM Quotas WHERE GroupName=%s AND Status=%s"
         values = ['AnalysisOps', '1']
-        data = self.dbaccess.dbQuery(query, values=tuple(values))
+        data = self.dbaccess.dbQuery(query, values=values)
         return [site[0] for site in data]
 
 #===================================================================================================
