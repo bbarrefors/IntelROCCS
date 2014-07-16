@@ -22,8 +22,8 @@ datasetRanker = datasetRanker.datasetRanker()
 datasetRankings = datasetRanker.getDatasetRankings(threshold)
 
 # Get site rankings
-siteRanker = siteRanker.siteRanker()
-siteRankings = siteRanker.getSiteRankings()
+#siteRanker = siteRanker.siteRanker()
+#siteRankings = siteRanker.getSiteRankings()
 
 # Select datasets and sites for subscriptions
 # subscriptions = dict()

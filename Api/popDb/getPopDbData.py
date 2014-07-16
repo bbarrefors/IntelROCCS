@@ -53,8 +53,8 @@ class getPopDbData:
 
 if __name__ == '__main__':
     cachePath = "%s/Cache/PopDbCache" % (os.environ['INTELROCCS_BASE'])
-    date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
     popDbData = getPopDbData(cachePath, 12)
-    jsonData = popDbData.getPopDbData(apiCall, date)
-    print jsonData
+    for i in range(22):
+        date = (datetime.date.today() - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+        jsonData = popDbData.getPopDbData("DSStatInTimeWindow", date)
     sys.exit(0)
