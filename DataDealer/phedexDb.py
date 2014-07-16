@@ -60,22 +60,21 @@ class phedexDb():
     def getDatasetSize(self, datasetName):
         with self.dbCon:
             cur = self.dbCon.cursor()
-            cur.execute('SELECT SizeGb FROM Datasets WHERE DatasetName=?', (datasetName))
+            cur.execute('SELECT SizeGb FROM Datasets WHERE DatasetName=?', (datasetName,))
             sizeGb = cur.fetchone()[0] # TODO : Check that something is returned
             return sizeGb
 
     def getNumberReplicas(self, datasetName):
         with self.dbCon:
             cur = self.dbCon.cursor()
-            cur.execute('SELECT SiteName FROM Replicas NATUREAL JOIN Datasets WHERE Datasets.DatasetName=?', (datasetName,))
+            cur.execute('SELECT SiteName, DatasetId FROM Replicas NATURAL JOIN Datasets WHERE Datasets.DatasetName=?', (datasetName,))
             replicas = 0
             for row in cur:
-                print row
                 replicas += 1
             return replicas
 
 if __name__ == '__main__':
     phedexDb = phedexDb(12)
-    replicas = phedexDb.getNumberReplicas("/RelValPREMIXUP15_PU25/CMSSW_7_0_5_patch1-PU25ns_POSTLS170_V7-v1/GEN-SIM-DIGI-RAW")
-    print replicas
+    size = phedexDb.getDatasetSize("/RelValPREMIXUP15_PU25/CMSSW_7_0_5_patch1-PU25ns_POSTLS170_V7-v1/GEN-SIM-DIGI-RAW")
+    print size
     sys.exit(0)
