@@ -55,7 +55,6 @@ class phedexDb():
                 datasetId = cur.lastrowid
                 for replica in dataset.get('block')[0].get('replica'):
                     siteName = replica.get('node')
-                    print siteName
                     cur.execute('INSERT INTO Replicas(SiteName, DatasetId) VALUES(?, ?)', (siteName, datasetId))
 
     def getDatasetSize(self, datasetName):
