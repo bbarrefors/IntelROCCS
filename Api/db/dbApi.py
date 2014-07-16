@@ -18,7 +18,7 @@ class dbApi():
         db = "SiteStorage" # ^^Will switch database^^
         user = "cmsSiteDb"
         passwd = "db78user?Cms"
-        self.DB_CON = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
+        self.dbCon = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 
 #===================================================================================================
 #  H E L P E R S
@@ -27,8 +27,8 @@ class dbApi():
         data = []
         values = tuple([str(value) for value in values])
         try:
-            with self.DB_CON:
-                cur = self.DB_CON.cursor()
+            with self.dbCon:
+                cur = self.dbCon.cursor()
                 cur.execute(query, values)
                 for i in range(cur.rowcount):
                     row = cur.fetchone()

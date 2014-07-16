@@ -7,14 +7,12 @@
 #---------------------------------------------------------------------------------------------------
 import sys, os, math, json, datetime, itemgetter
 sys.path.append(os.path.dirname(os.environ['INTELROCCS_BASE']))
-import IntelROCCS.Api.phedex.getPhedexData as phedexData
+import phedexDb
 import IntelROCCS.Api.popDb.getPopDbData as popDbData
 
 class datasetRanker():
     def __init__(self):
-        phedex = phedexData.getPhedexData("%s/Cache/PhedexCache" % (os.environ['INTELROCCS_BASE']), 12)
-        popDb = popDbData.getPopDbData("%s/Cache/PopDbCache" % (os.environ['INTELROCCS_BASE']), 12)
-        phedexJsonData = phedex.getPhedexData('blockReplicas')
+        phedex = phedexDb.phedexDb(12)
         date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         oneDayAgoPopDbJsonData = popDb.getPopDbData("DSStatInTimeWindow", date)
         oneDayAgoAccesses = popDbJsonDataParser(oneDayAgoPopDbJsonData)

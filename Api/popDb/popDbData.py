@@ -5,7 +5,7 @@
 import sys, os, json, datetime
 import popDbApi
 
-class getPopDbData:
+class popDbData:
     def __init__(self, cachePath, oldestAllowedHours):
         self.popDbApi = popDbApi.popDbApi()
         self.cachePath = cachePath
