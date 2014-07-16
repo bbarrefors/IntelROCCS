@@ -30,7 +30,7 @@ class phedexDb():
             with self.dbCon:
                 cur = self.dbCon.cursor()
                 cur.execute('CREATE TABLE Datasets (DatasetId INTEGER PRIMARY KEY AUTOINCREMENT, DatasetName TEXT UNIQUE, SizeGb INTEGER)')
-                cur.execute('CREATE TABLE Replicas (SiteName TEXT, DatasetId INTEGER, FOREIGN KEY(DatasetId) REFERENCES Datasets(DatasetId))')
+                cur.execute('CREATE TABLE Replicas (SiteName TEXT, DatasetId INTEGER, GroupName TEXT, FOREIGN KEY(DatasetId) REFERENCES Datasets(DatasetId))')
                 phedex = phedexData.phedexData(oldestAllowedHours)
                 phedexJsonData = phedex.getPhedexData('blockReplicas')
                 self.buildPhedexDb(phedexJsonData)
@@ -55,7 +55,8 @@ class phedexDb():
                 datasetId = cur.lastrowid
                 for replica in dataset.get('block')[0].get('replica'):
                     siteName = replica.get('node')
-                    cur.execute('INSERT INTO Replicas(SiteName, DatasetId) VALUES(?, ?)', (siteName, datasetId))
+                    groupName = replica.get('group')
+                    cur.execute('INSERT INTO Replicas(SiteName, DatasetId, GroupName) VALUES(?, ?, ?)', (siteName, datasetId, groupName))
 
     def getDatasetSize(self, datasetName):
         with self.dbCon:
@@ -76,7 +77,7 @@ class phedexDb():
     def getSiteReplicas(self, datasetName):
         with self.dbCon:
             cur = self.dbCon.cursor()
-            cur.execute('SELECT SiteName FROM Replicas NATURAL JOIN Datasets WHERE Datasets.DatasetName=?', (datasetName,))
+            cur.execute('SELECT SiteName FROM Replicas NATURAL JOIN Datasets WHERE Datasets.DatasetName=? AND Replicas.GroupName=?', (datasetName, 'AnalysisOps'))
             sites = []
             for row in cur:
                 sites.append(row[0])
@@ -85,7 +86,7 @@ class phedexDb():
     def getSiteStorage(self, siteName):
         with self.dbCon:
             cur = self.dbCon.cursor()
-            cur.execute('SELECT SizeGb FROM Datasets NATURAL JOIN Replicas WHERE Replicas.SiteName=?', (siteName,))
+            cur.execute('SELECT SizeGb FROM Datasets NATURAL JOIN Replicas WHERE Replicas.SiteName=? ANd Replicas.GroupName=?', (siteName, 'AnalysisOps'))
             storageGb = 0
             for row in cur:
                 storageGb += row[0]
@@ -93,6 +94,6 @@ class phedexDb():
 
 if __name__ == '__main__':
     phedexDb = phedexDb(12)
-    sites = phedexDb.getSiteReplica("T2_CH_CERN","/RelValPREMIXUP15_PU25/CMSSW_7_0_5_patch1-PU25ns_POSTLS170_V7-v1/GEN-SIM-DIGI-RAW")
-    print sites
+    storage = phedexDb.getSiteStorage("T2_CH_CERN")
+    print storage
     sys.exit(0)
