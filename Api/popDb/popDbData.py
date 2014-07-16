@@ -5,7 +5,7 @@
 import sys, os, json, datetime
 import popDbApi
 
-class getPopDbData:
+class popDbData:
     def __init__(self, cachePath, oldestAllowedHours):
         self.popDbApi = popDbApi.popDbApi()
         self.cachePath = cachePath
@@ -54,7 +54,7 @@ class getPopDbData:
 if __name__ == '__main__':
     cachePath = "%s/Cache/PopDbCache" % (os.environ['INTELROCCS_BASE'])
     date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-    popDbData = getPopDbData(cachePath, 12)
+    popDbData = popDbData(cachePath, 12)
     jsonData = popDbData.getPopDbData(apiCall, date)
     print jsonData
     sys.exit(0)
