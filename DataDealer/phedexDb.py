@@ -73,8 +73,26 @@ class phedexDb():
                 replicas += 1
             return replicas
 
+    def getSiteReplicas(self, datasetName):
+        with self.dbCon:
+            cur = self.dbCon.cursor()
+            cur.execute('SELECT SiteName FROM Replicas NATURAL JOIN Datasets WHERE Datasets.DatasetName=?', (datasetName,))
+            sites = []
+            for row in cur:
+                sites.append(row[0])
+            return sites
+
+    def getSiteStorage(self, siteName):
+        with self.dbCon:
+            cur = self.dbCon.cursor()
+            cur.execute('SELECT SizeGb FROM Datasets NATURAL JOIN Replicas WHERE Replicas.SiteName=?', (siteName,))
+            storageGb = 0
+            for row in cur:
+                storageGb += row[0]
+            return storageGb
+
 if __name__ == '__main__':
     phedexDb = phedexDb(12)
-    size = phedexDb.getDatasetSize("/RelValPREMIXUP15_PU25/CMSSW_7_0_5_patch1-PU25ns_POSTLS170_V7-v1/GEN-SIM-DIGI-RAW")
-    print size
+    sites = phedexDb.getSiteReplica("T2_CH_CERN","/RelValPREMIXUP15_PU25/CMSSW_7_0_5_patch1-PU25ns_POSTLS170_V7-v1/GEN-SIM-DIGI-RAW")
+    print sites
     sys.exit(0)
